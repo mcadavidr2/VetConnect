@@ -1,0 +1,83 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinarios Cercanos</title>
+
+    <!-- CSRF Token meta tag -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    <h1>¡Bienvenido a nuestra página!</h1>
+    <p>Descubre los veterinarios cercanos a tu ubicación.</p>
+
+    <h2>Veterinarios Cercanos</h2>
+    <ul id="veterinarios-lista"></ul>
+
+    
+    <script>
+        function obtenerUbicacion() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(enviarUbicacion);
+            } else {
+                alert("Geolocalización no está soportada por este navegador.");
+            }
+        }
+
+        function enviarUbicacion(position) {
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+
+            // Enviar la ubicación al backend
+            fetch('/vet/veterinarios/cercanos/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // CSRF Token
+                },
+                body: JSON.stringify({ latitud: lat, longitud: lon })
+            })
+            .then(response => response.json())
+            .then(data => {
+                mostrarVeterinarios(data);
+            })
+            .catch(error => {
+                console.error('Error al obtener los veterinarios:', error);
+            });
+        }
+
+        function mostrarVeterinarios(veterinarios) {
+            // Mostrar los veterinarios cercanos en el frontend
+            const listaVeterinarios = document.getElementById('veterinarios-lista');
+            listaVeterinarios.innerHTML = ''; 
+            veterinarios.forEach(vet => {
+                const item = document.createElement('li');
+                item.textContent = `${vet.nombre} - ${vet.direccion}`;
+                listaVeterinarios.appendChild(item);
+            });
+        }
+
+        // Función para obtener el token CSRF 
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // token CSRF
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Llamar a la función de geolocalización
+        window.onload = obtenerUbicacion;
+    </script>
+</body>
+</html>

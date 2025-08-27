@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat con Veterinario</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+        .message { margin: 5px 0; }
+        .sender { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Chat con el Veterinario</h1>
+
+    <div class="chat-box">
+        {% for msg in messages %}
+            <div class="message">
+                <span class="sender">{{ msg.sender }}:</span> {{ msg.text }}
+                <br><small>{{ msg.timestamp|date:"H:i" }}</small>
+            </div>
+        {% empty %}
+            <p>No hay mensajes todavía.</p>
+        {% endfor %}
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="sender" placeholder="Tu nombre" required>
+        <input type="text" name="text" placeholder="Escribe un mensaje..." required>
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>
