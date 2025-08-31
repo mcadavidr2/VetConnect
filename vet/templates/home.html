@@ -1,83 +1,114 @@
-<!-- templates/home.html -->
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="es" data-bs-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veterinarios Cercanos</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Veterinarios Cercanos</title>
 
-    <!-- CSRF Token meta tag -->
-    <meta name="csrf-token" content="{{ csrf_token }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <style>
+    .card{border-radius:16px}
+    .distance{font-size:.9rem}
+  </style>
 </head>
-<body>
-    <h1>¡Bienvenido a nuestra página!</h1>
-    <p>Descubre los veterinarios cercanos a tu ubicación.</p>
+<body class="bg-body">
+  <nav class="navbar bg-body-tertiary border-bottom">
+    <div class="container">
+      <span class="navbar-brand fw-bold">VetConnect</span>
+      <a href="{% url 'veterinarios_cercanos' %}" class="btn btn-outline-primary btn-sm">Ver listado completo</a>
+    </div>
+  </nav>
 
-    <h2>Veterinarios Cercanos</h2>
-    <ul id="veterinarios-lista"></ul>
+  <main class="container py-4">
+    <h1 class="h3 mb-1">Veterinarios Cercanos</h1>
+    <p class="text-secondary">Descubre clínicas cerca de tu ubicación.</p>
 
-    
-    <script>
-        function obtenerUbicacion() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(enviarUbicacion);
-            } else {
-                alert("Geolocalización no está soportada por este navegador.");
-            }
-        }
+    <div class="d-flex gap-2 align-items-center mb-3">
+      <button id="btnUbicacion" class="btn btn-primary">Usar mi ubicación</button>
+      <div id="estado" class="small text-secondary"></div>
+    </div>
 
-        function enviarUbicacion(position) {
-            let lat = position.coords.latitude;
-            let lon = position.coords.longitude;
+    <div id="spinner" class="d-none text-center py-4">
+      <div class="spinner-border" role="status"></div>
+      <div class="small mt-2">Calculando distancias…</div>
+    </div>
 
-            // Enviar la ubicación al backend
-            fetch('/vet/veterinarios/cercanos/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'), // CSRF Token
-                },
-                body: JSON.stringify({ latitud: lat, longitud: lon })
-            })
-            .then(response => response.json())
-            .then(data => {
-                mostrarVeterinarios(data);
-            })
-            .catch(error => {
-                console.error('Error al obtener los veterinarios:', error);
-            });
-        }
+    <div id="lista" class="row g-3"></div>
+  </main>
 
-        function mostrarVeterinarios(veterinarios) {
-            // Mostrar los veterinarios cercanos en el frontend
-            const listaVeterinarios = document.getElementById('veterinarios-lista');
-            listaVeterinarios.innerHTML = ''; 
-            veterinarios.forEach(vet => {
-                const item = document.createElement('li');
-                item.textContent = `${vet.nombre} - ${vet.direccion}`;
-                listaVeterinarios.appendChild(item);
-            });
-        }
+  <script>
+    const ENDPOINT = "{% url 'veterinarios_cercanos' %}";
+    const lista = document.getElementById('lista');
+    const estado = document.getElementById('estado');
+    const spinner = document.getElementById('spinner');
+    const btn = document.getElementById('btnUbicacion');
 
-        // Función para obtener el token CSRF 
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    // token CSRF
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
+    function getCookie(name){
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if(parts.length === 2) return parts.pop().split(';').shift();
+    }
 
-        // Llamar a la función de geolocalización
-        window.onload = obtenerUbicacion;
-    </script>
+    function pintar(vets){
+      lista.innerHTML = '';
+      if(!vets.length){
+        lista.innerHTML = '<div class="col-12"><div class="alert alert-warning">No se encontraron veterinarios.</div></div>';
+        return;
+      }
+      // Ordenados por distancia si viene en el JSON
+      vets.forEach(v=>{
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-6 col-lg-4';
+        col.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h2 class="h5 mb-2">${v.nombre}</h2>
+              <p class="mb-1">${v.direccion}</p>
+              <p class="mb-1">📞 ${v.telefono}</p>
+              <a class="small" href="mailto:${v.email}">${v.email}</a>
+              ${v.distancia !== undefined ? `<div class="text-secondary distance mt-2">≈ ${v.distancia.toFixed(2)} km</div>` : ''}
+            </div>
+          </div>`;
+        lista.appendChild(col);
+      });
+    }
+
+    function consultar(lat, lon){
+      spinner.classList.remove('d-none');
+      estado.textContent = '';
+      fetch(ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ latitud: lat, longitud: lon })
+      })
+      .then(r => r.ok ? r.json() : Promise.reject(r))
+      .then(data => { pintar(data); })
+      .catch(()=> { estado.textContent = 'No se pudo obtener la lista.'; })
+      .finally(()=> spinner.classList.add('d-none'));
+    }
+
+    btn.addEventListener('click', ()=>{
+      if(!navigator.geolocation){
+        estado.textContent = 'Tu navegador no soporta geolocalización.';
+        return;
+      }
+      estado.textContent = 'Obteniendo ubicación…';
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          estado.textContent = 'Ordenando por cercanía…';
+          consultar(pos.coords.latitude, pos.coords.longitude);
+        },
+        () => { estado.textContent = 'Ubicación denegada. Muestra el listado completo en el enlace de arriba.'; }
+      );
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
 </body>
 </html>
