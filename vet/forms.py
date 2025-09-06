@@ -1,4 +1,31 @@
 from django import forms
+from django.contrib.auth.models import User
+
+
+class SignUpForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput, label='Password')
+    password2 = forms.CharField(widget=forms.PasswordInput, label='Password confirmation')
+    tipo_cuenta = forms.ChoiceField(
+        choices=[('usuario', 'Usuario'), ('veterinario', 'Veterinario')],
+        label='Tipo de cuenta',
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    cedula = forms.CharField(label='Cédula / ID')
+    certificado = forms.FileField(label='Certificado', required=False)
+    ubicacion_trabajo = forms.CharField(label='Ubicación de trabajo', required=False)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        password2 = cleaned_data.get('password2')
+        if password and password2 and password != password2:
+            self.add_error('password2', 'Las contraseñas no coinciden.')
+        return cleaned_data
+from django import forms
 from .models import VeterinaryServiceRequest
 
 class VeterinaryServiceRequestForm(forms.ModelForm):

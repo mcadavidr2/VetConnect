@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
-    'vet'
+    'vet',
+    'widget_tweaks',
 ]
 
 ASGI_APPLICATION = 'vetconnect.asgi.application'

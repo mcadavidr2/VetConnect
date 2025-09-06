@@ -1,3 +1,19 @@
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from .forms import SignUpForm
+# Vista para registro básico
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            # Aquí podrías guardar tipo_cuenta y cedula en un modelo extendido si lo deseas
+            return redirect('home')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
 import json
 from django.shortcuts import render, redirect
 from django.http import HttpResponse

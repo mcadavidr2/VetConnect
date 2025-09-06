@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm border-0" style="border-radius:18px;">
+        <div class="card-body p-4">
+          <h2 class="text-center mb-3" style="font-weight:600;">Crear tu cuenta</h2>
+          <p class="text-center text-secondary mb-4">Regístrate para acceder a VetConnect</p>
+          <form method="post" autocomplete="off" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">{{ form.username.label }}</label>
+              {{ form.username|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ form.email.label }}</label>
+              {{ form.email|add_class:'form-control' }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ form.password.label }}</label>
+              {{ form.password|add_class:'form-control' }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ form.password2.label }}</label>
+              {{ form.password2|add_class:'form-control' }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ form.tipo_cuenta.label }}</label>
+              {{ form.tipo_cuenta|add_class:'form-control' }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ form.cedula.label }}</label>
+              {{ form.cedula|add_class:'form-control' }}
+            </div>
+            <div id="campos-veterinario" style="display:none;">
+              <div class="mb-3">
+                <label class="form-label">{{ form.certificado.label }}</label>
+                {{ form.certificado|add_class:'form-control' }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{{ form.ubicacion_trabajo.label }}</label>
+                {{ form.ubicacion_trabajo|add_class:'form-control' }}
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100" style="font-weight:500;font-size:1.1rem;">Registrarse</button>
+          </form>
+          <script>
+            const tipoCuenta = document.getElementById('id_tipo_cuenta');
+            const camposVet = document.getElementById('campos-veterinario');
+            function mostrarCamposVet() {
+              if (tipoCuenta.value === 'veterinario') {
+                camposVet.style.display = '';
+              } else {
+                camposVet.style.display = 'none';
+              }
+            }
+            tipoCuenta.addEventListener('change', mostrarCamposVet);
+            window.addEventListener('DOMContentLoaded', mostrarCamposVet);
+          </script>
+          <div class="text-center mt-3">
+            <a href="/" class="text-decoration-none">Volver al inicio</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% comment %} Filtro para agregar clase a los campos del formulario {% endcomment %}
+{% load widget_tweaks %}
+{% endblock %}
