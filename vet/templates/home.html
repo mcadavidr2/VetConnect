@@ -20,9 +20,12 @@
     <h1 class="h3 mb-1">Veterinarios Cercanos</h1>
     <p class="text-secondary">Descubre clínicas cerca de tu ubicación.</p>
 
+
     <div class="d-flex gap-2 align-items-center mb-3">
       <button id="btnUbicacion" class="btn btn-primary">Usar mi ubicación</button>
-       <a href="{% url 'veterinarios_cercanos' %}" class="btn btn-outline-primary">Ver listado completo</a>
+      <a href="{% url 'veterinarios_cercanos' %}" class="btn btn-outline-primary">Ver listado completo</a>
+      <input type="text" id="inputDireccion" class="form-control" style="max-width:250px" placeholder="Buscar por ciudad o dirección">
+  <button id="btnBuscarDireccion" class="btn btn-primary">Buscar</button>
       <div id="estado" class="small text-secondary"></div>
     </div>
 
@@ -101,6 +104,34 @@
         },
         () => { estado.textContent = 'Ubicación denegada. Muestra el listado completo en el enlace de arriba.'; }
       );
+    });
+
+    // Buscar por dirección o ciudad usando Nominatim
+    document.getElementById('btnBuscarDireccion').addEventListener('click', ()=>{
+      const direccion = document.getElementById('inputDireccion').value.trim();
+      if(!direccion){
+        estado.textContent = 'Ingresa una ciudad o dirección.';
+        return;
+      }
+      estado.textContent = 'Buscando dirección…';
+      spinner.classList.remove('d-none');
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccion)}`)
+        .then(r => r.json())
+        .then(data => {
+          if(data.length === 0){
+            estado.textContent = 'No se encontró la dirección.';
+            spinner.classList.add('d-none');
+            return;
+          }
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          estado.textContent = 'Ordenando por cercanía…';
+          consultar(lat, lon);
+        })
+        .catch(()=>{
+          estado.textContent = 'Error buscando dirección.';
+        })
+        .finally(()=> spinner.classList.add('d-none'));
     });
   </script>
 
