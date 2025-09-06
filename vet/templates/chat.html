@@ -1,33 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Chat con Veterinario</title>
+{% extends "base.html" %}
+{% block content %}
     <style>
-        body { font-family: Arial; margin: 20px; }
-        .chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
-        .message { margin: 5px 0; }
-        .sender { font-weight: bold; }
+        body { background: #f8f9fa; }
+        .chat-box {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            background: white;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 70%;
+        }
+        .message.cliente {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        .message.veterinario {
+            background-color: #e9ecef;
+            margin-right: auto;
+        }
     </style>
-</head>
-<body>
-    <h1>Chat con el Veterinario</h1>
 
-    <div class="chat-box">
-        {% for msg in messages %}
-            <div class="message">
-                <span class="sender">{{ msg.sender }}:</span> {{ msg.text }}
-                <br><small>{{ msg.timestamp|date:"H:i" }}</small>
-            </div>
-        {% empty %}
-            <p>No hay mensajes todavía.</p>
-        {% endfor %}
+    <div class="container py-4">
+        <h2 class="text-center mb-4">Chat con el Veterinario 🐾</h2>
+
+        <!-- Caja de mensajes -->
+        <div class="chat-box mb-3 shadow-sm">
+            {% for msg in messages %}
+                <div class="message {% if msg.sender == 'cliente' %}cliente{% else %}veterinario{% endif %}">
+                    <strong>{{ msg.sender }}:</strong> {{ msg.text }} <br>
+                    <small class="text-muted">{{ msg.timestamp|date:"H:i" }}</small>
+                </div>
+            {% empty %}
+                <p class="text-muted">No hay mensajes todavía.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Formulario -->
+        <form method="POST" class="d-flex gap-2">
+            {% csrf_token %}
+            <input type="text" name="sender" class="form-control" placeholder="Tu nombre" required>
+            <input type="text" name="text" class="form-control" placeholder="Escribe un mensaje..." required>
+            <button type="submit" class="btn btn-success">Enviar</button>
+        </form>
     </div>
-
-    <form method="POST">
-        {% csrf_token %}
-        <input type="text" name="sender" placeholder="Tu nombre" required>
-        <input type="text" name="text" placeholder="Escribe un mensaje..." required>
-        <button type="submit">Enviar</button>
-    </form>
-</body>
-</html>
+{% endblock %}
