@@ -1,6 +1,24 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
+from .forms import ProfileForm
+from django.contrib.auth.decorators import login_required
+
+
+
+def edit_profile(request):
+    if request.method == "POST":
+        form = ProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect("/home")  # cámbialo a donde quieras redirigir después de guardar
+    else:
+        form = ProfileForm()
+
+    return render(request, "edit_profile.html", {"form": form})
+
+
+
 # Vista para registro básico
 def signup(request):
     if request.method == 'POST':

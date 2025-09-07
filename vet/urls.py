@@ -9,5 +9,6 @@ urlpatterns = [
     path('request-success/', views.service_success, name='service_success'),
     path('veterinarios/cercanos/', views.veterinarios_cercanos, name='veterinarios_cercanos'),
     path('signup/', views.signup, name='signup'),
+    path("edit-profile/", views.edit_profile, name="profile"),
 ]
 

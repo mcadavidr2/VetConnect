@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import Perfil
 
 
 class SignUpForm(forms.ModelForm):
@@ -52,3 +53,20 @@ class VeterinaryServiceRequestForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Perfil
+        fields = [
+            'cedula',
+            'tipo_cuenta',
+            'certificado',
+            'ubicacion_trabajo'
+        ]
+        widgets = {
+            'cedula': forms.TextInput(attrs={'class': 'form-control'}),
+            'tipo_cuenta': forms.Select(attrs={'class': 'form-control'}),
+            'certificado': forms.FileInput(attrs={'class': 'form-control'}),
+            'ubicacion_trabajo': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
