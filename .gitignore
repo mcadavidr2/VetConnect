@@ -1,1 +1,17 @@
-*.pyc
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+env/
+virtualenv/
+
+# Django stuff
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+/media
+/staticfiles

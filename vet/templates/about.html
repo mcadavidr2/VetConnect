@@ -1,10 +1,178 @@
 <!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+{% block content%}
+<html lang="en">
 <head>
-    <title>About</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About VetConnect</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9fafb;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #1e3a8a;
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+
+    header p {
+      margin: 0.5rem 0 0;
+      font-size: 1.2rem;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 2rem 1rem;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      color: #1e3a8a;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul li {
+      background: #ffffff;
+      margin: 0.4rem 0;
+      padding: 0.8rem 1rem;
+      border-left: 4px solid #1e3a8a;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .team {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .team-member {
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .team-member:hover {
+      transform: translateY(-5px);
+    }
+
+    .team-member h3 {
+      margin: 0.5rem 0;
+      font-size: 1.2rem;
+      color: #1e3a8a;
+    }
+
+    .team-member p {
+      margin: 0.2rem 0;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      background: #1e3a8a;
+      color: white;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      margin-top: 2rem;
+    }
+
+    footer p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
-    <h1>About Page</h1>
-    <p>This is the about page from a template.</p>
+  <header>
+    <h1>About VetConnect</h1>
+    <p>Connecting pet owners with certified veterinarians, anytime, anywhere.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Key Features</h2>
+      <ul>
+        <li>User registration and authentication</li>
+        <li>Choose treatment location (home or clinic)</li>
+        <li>Select preferred veterinarian</li>
+        <li>Real-time chat with veterinarian</li>
+        <li>Medicine delivery service</li>
+        <li>AI-powered pre-diagnosis</li>
+        <li>Browse services without registration</li>
+        <li>Display nearby veterinarians</li>
+        <li>Maintain historical consultation records</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Technical Overview</h2>
+      <ul>
+        <li><strong>System Interfaces:</strong> Google Maps API, payment gateways, AI modules</li>
+        <li><strong>User Interfaces:</strong> Responsive design (PC, tablet, smartphone)</li>
+        <li><strong>Hardware Interfaces:</strong> Runs on any modern browser</li>
+        <li><strong>Software Interfaces:</strong> Django backend, React frontend, Tailwind CSS</li>
+        <li><strong>Communication Interfaces:</strong> Secure HTTPS protocols</li>
+        <li><strong>Performance:</strong> Lightweight, requires &lt;200MB RAM</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Our Team</h2>
+      <div class="team">
+        <div class="team-member">
+          <h3>Mateo Cadavid</h3>
+          <p><em>Scrum Master / Developer</em></p>
+          <p><a href="https://github.com/Mcadavidr2" target="_blank">GitHub: Mcadavidr2</a></p>
+        </div>
+        <div class="team-member">
+          <h3>Emilton Mena</h3>
+          <p><em>Developer</em></p>
+          <p><a href="https://github.com/Emilton" target="_blank">GitHub: Emilton</a></p>
+        </div>
+        <div class="team-member">
+          <h3>Alejandro Sepúlveda</h3>
+          <p><em>Developer</em></p>
+          <p><a href="https://github.com/AlejandroSPosada" target="_blank">GitHub: AlejandroSPosada</a></p>
+        </div>
+        <div class="team-member">
+          <h3>Juan Andrés Salcedo</h3>
+          <p><em>Developer</em></p>
+          <p><a href="https://github.com/Salcedo0" target="_blank">GitHub: Salcedo0</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 VetConnect. All rights reserved.</p>
+  </footer>
 </body>
 </html>
+{% endblock %}

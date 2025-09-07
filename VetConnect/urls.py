@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('vet.urls')),
     path('', vetViews.home),
-    path('about/', vetViews.about),
+    path('about/', vetViews.about, name='about'),
     path('chat/', views.chat_view, name='chat'),
     path('admin/', admin.site.urls),
     path('vet/', include('vet.urls')),
