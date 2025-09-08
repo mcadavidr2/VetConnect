@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from vet import views as vetViews
 from vet import views
+from django.contrib.auth import views as auth_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('vet.urls')),
@@ -26,6 +28,7 @@ urlpatterns = [
     path('chat/', views.chat_view, name='chat'),
     path('admin/', admin.site.urls),
     path('vet/', include('vet.urls')),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
 ]
 
 
