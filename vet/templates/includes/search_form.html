@@ -1,0 +1,4 @@
+<form class="d-flex" role="search" action="{% url 'veterinarios_por_especializacion' %}" method="get">
+  <input class="form-control me-2" type="search" name="q" placeholder="Buscar por especialización o nombre" value="{{ request.GET.q }}">
+  <button class="btn btn-outline-success" type="submit">Buscar</button>
+</form>

@@ -23,10 +23,21 @@
           <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'request_service' %}">Solicitar Servicio</a></li>
         </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Buscar">
-          <button class="btn btn-outline-success" type="submit">Buscar</button>
-        </form>
+        <ul class="navbar-nav ms-auto me-3">
+          {% if request.user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ request.user.username }}</a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                <li><a class="dropdown-item" href="{% url 'profile' %}">Editar perfil</a></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Registrarse</a></li>
+          {% endif %}
+        </ul>
+        {% include 'includes/search_form.html' %}
       </div>
     </div>
   </nav>

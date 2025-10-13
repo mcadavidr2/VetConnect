@@ -1,19 +1,28 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import ensure_csrf_cookie
 from .forms import SignUpForm
 from .forms import ProfileForm
 from django.contrib.auth.decorators import login_required
 
 
 
+@login_required
 def edit_profile(request):
+    # Obtener o crear el perfil asociado al usuario
+    try:
+        perfil = request.user.perfil
+    except Exception:
+        Perfil = __import__('vet.models', fromlist=['Perfil']).Perfil
+        perfil = Perfil.objects.create(usuario=request.user, cedula='', tipo_cuenta='usuario')
+
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES)
+        form = ProfileForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
             form.save()
-            return redirect("/home")  # cámbialo a donde quieras redirigir después de guardar
+            return redirect('home')
     else:
-        form = ProfileForm()
+        form = ProfileForm(instance=perfil)
 
     return render(request, "edit_profile.html", {"form": form})
 
@@ -22,12 +31,24 @@ def edit_profile(request):
 # Vista para registro básico
 def signup(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = SignUpForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
-            # Aquí podrías guardar tipo_cuenta y cedula en un modelo extendido si lo deseas
+            # Crear Perfil asociado
+            tipo = form.cleaned_data.get('tipo_cuenta')
+            cedula = form.cleaned_data.get('cedula')
+            certificado = form.cleaned_data.get('certificado')
+            ubicacion = form.cleaned_data.get('ubicacion_trabajo')
+            Perfil = __import__('vet.models', fromlist=['Perfil']).Perfil
+            Perfil.objects.create(
+                usuario=user,
+                cedula=cedula,
+                tipo_cuenta=tipo,
+                certificado=certificado,
+                ubicacion_trabajo=ubicacion,
+            )
             return redirect('home')
     else:
         form = SignUpForm()
@@ -41,8 +62,12 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from .models import Veterinario
 from math import radians, sin, cos, sqrt, atan2
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import re
 
 # Create your views here.
+@ensure_csrf_cookie
 def home(request):
     return render(request, 'home.html')
 
@@ -128,3 +153,61 @@ def veterinarios_cercanos(request):
     else:
         #  POST, responder con un error
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+@ensure_csrf_cookie
+def veterinarios_por_especializacion(request):
+    """
+    Busca veterinarios por especializacion (query param: q) y muestra resultados paginados.
+    """
+    q = request.GET.get('q', '').strip()
+    veterinarios = Veterinario.objects.all()
+    if q:
+        # Tokenize query and match any token in name or specialization (OR across tokens)
+        tokens = [t for t in re.split(r"\s+", q) if t]
+        combined_q = None
+        for token in tokens:
+            token_q = Q(especializacion__icontains=token) | Q(nombre__icontains=token)
+            if combined_q is None:
+                combined_q = token_q
+            else:
+                combined_q |= token_q
+        if combined_q is not None:
+            veterinarios = veterinarios.filter(combined_q)
+
+    # Ordenar por nombre para estabilidad
+    veterinarios = veterinarios.order_by('nombre')
+
+    # Paginación
+    page = request.GET.get('page', 1)
+    paginator = Paginator(veterinarios, 9)  # 9 por página
+    try:
+        veterinarios_page = paginator.page(page)
+    except PageNotAnInteger:
+        veterinarios_page = paginator.page(1)
+    except EmptyPage:
+        veterinarios_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'veterinarios_por_especializacion.html', {
+        'veterinarios': veterinarios_page,
+        'q': q,
+        'paginator': paginator,
+    })
+
+
+@ensure_csrf_cookie
+def veterinarios_list(request):
+    """Listado completo de veterinarios paginado."""
+    veterinarios = Veterinario.objects.all().order_by('nombre')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(veterinarios, 9)
+    try:
+        veterinarios_page = paginator.page(page)
+    except PageNotAnInteger:
+        veterinarios_page = paginator.page(1)
+    except EmptyPage:
+        veterinarios_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'veterinarios_list.html', {
+        'veterinarios': veterinarios_page,
+        'paginator': paginator,
+    })

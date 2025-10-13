@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h1 class="h4">Listado de Veterinarios</h1>
+  <p class="text-secondary">Mostrando todos los veterinarios registrados.</p>
+
+  {% if veterinarios.object_list %}
+    <div class="row g-3">
+      {% for vet in veterinarios.object_list %}
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h2 class="h5 mb-2">{{ vet.nombre }}</h2>
+              <p class="mb-1">{{ vet.direccion }}</p>
+              <p class="mb-1">Especialización: {{ vet.especializacion }}</p>
+              <p class="mb-1">📞 {{ vet.telefono }}</p>
+              <a class="small" href="mailto:{{ vet.email }}">{{ vet.email }}</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination controls -->
+    <nav class="mt-4" aria-label="Paginación">
+      <ul class="pagination">
+        {% if veterinarios.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ veterinarios.previous_page_number }}">Anterior</a></li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+        {% endif %}
+
+        {% for num in veterinarios.paginator.page_range %}
+          {% if num == veterinarios.number %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if veterinarios.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ veterinarios.next_page_number }}">Siguiente</a></li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+  {% else %}
+    <div class="alert alert-warning">No hay veterinarios registrados.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load search_extras %}
+{% block content %}
+<div class="container mt-4">
+  <h1 class="h4">Resultados de búsqueda</h1>
+  {% if q %}
+    <p class="text-secondary">Resultados para: "<strong>{{ q }}</strong>" — <span class="fw-semibold">{{ paginator.count }}</span> encontrados</p>
+  {% else %}
+    <p class="text-secondary">Listado de veterinarios — <span class="fw-semibold">{{ paginator.count }}</span> en total</p>
+  {% endif %}
+
+  {% if veterinarios.object_list %}
+    <div class="row g-3">
+      {% for vet in veterinarios.object_list %}
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h2 class="h5 mb-2">{{ vet.nombre|safe }}</h2>
+              <p class="mb-1">{{ vet.direccion }}</p>
+              <p class="mb-1">Especialización: {{ vet.especializacion|default:""|highlight:q }}</p>
+              <p class="mb-1">📞 {{ vet.telefono }}</p>
+              <a class="small" href="mailto:{{ vet.email }}">{{ vet.email }}</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination controls -->
+    <nav class="mt-4" aria-label="Paginación">
+      <ul class="pagination">
+        {% if veterinarios.has_previous %}
+          <li class="page-item"><a class="page-link" href="?q={{ q }}&page={{ veterinarios.previous_page_number }}">Anterior</a></li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+        {% endif %}
+
+        {% for num in veterinarios.paginator.page_range %}
+          {% if num == veterinarios.number %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?q={{ q }}&page={{ num }}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if veterinarios.has_next %}
+          <li class="page-item"><a class="page-link" href="?q={{ q }}&page={{ veterinarios.next_page_number }}">Siguiente</a></li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+  {% else %}
+    <div class="alert alert-warning">No se encontraron veterinarios.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -20,12 +20,8 @@ from vet import views as vetViews
 from vet import views
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Delegate application routes to the vet app
     path('', include('vet.urls')),
-    path('', vetViews.home),
-    path('about/', vetViews.about, name='about'),
-    path('chat/', views.chat_view, name='chat'),
-    path('admin/', admin.site.urls),
-    path('vet/', include('vet.urls')),
 ]
 
 
