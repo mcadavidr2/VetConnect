@@ -5,7 +5,9 @@ from .forms import SignUpForm
 from .forms import ProfileForm
 from django.contrib.auth.decorators import login_required
 
-
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Veterinario, Perfil
 
 @login_required
 def edit_profile(request):
@@ -99,10 +101,6 @@ def request_veterinary_service(request):
 
 def service_success(request):
     return render(request, 'service_success.html')
-
-
-
-
 
 # Función para calcular la distancia usando la fórmula Haversine
 def calcular_distancia(lat1, lon1, lat2, lon2):
@@ -211,3 +209,23 @@ def veterinarios_list(request):
         'veterinarios': veterinarios_page,
         'paginator': paginator,
     })
+
+@login_required
+def toggle_favorite(request, vet_id):
+    perfil = Perfil.objects.get(usuario=request.user)
+    veterinario = Veterinario.objects.get(id=vet_id)
+
+    if veterinario in perfil.favoritos.all():
+        perfil.favoritos.remove(veterinario)
+        is_favorite = False
+    else:
+        perfil.favoritos.add(veterinario)
+        is_favorite = True
+
+    return JsonResponse({'is_favorite': is_favorite})
+
+@login_required
+def mis_favoritos(request):
+    perfil = Perfil.objects.get(usuario=request.user)
+    veterinarios = perfil.favoritos.all()  # all favorite vets of this user
+    return render(request, 'mis_favoritos.html', {'veterinarios': veterinarios})

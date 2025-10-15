@@ -22,6 +22,7 @@
           <li class="nav-item"><a class="nav-link" href="{% url 'chat' %}">Chat</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'request_service' %}">Solicitar Servicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'mis_favoritos' %}">Favoritos</a></li>
         </ul>
         <ul class="navbar-nav ms-auto me-3">
           {% if request.user.is_authenticated %}

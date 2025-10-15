@@ -9,15 +9,28 @@
     <p class="text-secondary">Listado de veterinarios — <span class="fw-semibold">{{ paginator.count }}</span> en total</p>
   {% endif %}
 
-  {% if veterinarios.object_list %}
+    {% if veterinarios.object_list %}
     <div class="row g-3">
       {% for vet in veterinarios.object_list %}
         <div class="col-12 col-md-6 col-lg-4">
-          <div class="card h-100 shadow-sm">
+          <div class="card h-100 shadow-sm position-relative">
             <div class="card-body">
-              <h2 class="h5 mb-2">{{ vet.nombre|safe }}</h2>
+              <!-- Heart icon (toggle favorite) -->
+              {% if request.user.is_authenticated %}
+                {% if vet in request.user.perfil.favoritos.all %}
+                  <span class="favorite-heart"
+                        style="position:absolute; top:10px; right:10px; cursor:pointer; font-size:1.5rem; color:red;"
+                        onclick="toggleFavorite({{ vet.id }}, this)">❤️</span>
+                {% else %}
+                  <span class="favorite-heart"
+                        style="position:absolute; top:10px; right:10px; cursor:pointer; font-size:1.5rem;"
+                        onclick="toggleFavorite({{ vet.id }}, this)">🤍</span>
+                {% endif %}
+              {% endif %}
+
+              <h2 class="h5 mb-2">{{ vet.nombre }}</h2>
               <p class="mb-1">{{ vet.direccion }}</p>
-              <p class="mb-1">Especialización: {{ vet.especializacion|default:""|highlight:q }}</p>
+              <p class="mb-1">Especialización: {{ vet.especializacion }}</p>
               <p class="mb-1">📞 {{ vet.telefono }}</p>
               <a class="small" href="mailto:{{ vet.email }}">{{ vet.email }}</a>
             </div>
@@ -55,4 +68,27 @@
     <div class="alert alert-warning">No se encontraron veterinarios.</div>
   {% endif %}
 </div>
+
+<script>
+function toggleFavorite(vetId, el) {
+  fetch(`/toggle-favorite/${vetId}/`, {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.is_favorite) {
+      el.textContent = '❤️';
+      el.style.color = 'red';
+    } else {
+      el.textContent = '🤍';
+      el.style.color = '';
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+</script>
+
 {% endblock %}

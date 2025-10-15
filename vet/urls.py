@@ -15,5 +15,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path("edit-profile/", views.edit_profile, name="profile"),
+    path('toggle-favorite/<int:vet_id>/', views.toggle_favorite, name='toggle_favorite'),
+    path('favoritos/', views.mis_favoritos, name='mis_favoritos'),
 ]
 

@@ -13,6 +13,7 @@ class Perfil(models.Model):
     )
     certificado = models.FileField(upload_to='certificados/', blank=True, null=True)
     ubicacion_trabajo = models.CharField(max_length=255, blank=True, null=True)
+    favoritos = models.ManyToManyField('Veterinario', blank=True, related_name='favoritos_de')
 
     def __str__(self):
         return f"{self.usuario.username} ({self.tipo_cuenta})"

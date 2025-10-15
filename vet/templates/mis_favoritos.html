@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h1 class="h4 mb-3">❤️ Mis Veterinarios Favoritos</h1>
+
+  {% if veterinarios %}
+    <div class="row g-3">
+      {% for vet in veterinarios %}
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm position-relative">
+            <div class="card-body">
+              <span class="favorite-heart"
+                    style="position:absolute; top:10px; right:10px; cursor:pointer; font-size:1.5rem; color:red;"
+                    onclick="toggleFavorite({{ vet.id }}, this)">❤️</span>
+
+              <h2 class="h5 mb-2">{{ vet.nombre }}</h2>
+              <p class="mb-1">{{ vet.direccion }}</p>
+              <p class="mb-1">Especialización: {{ vet.especializacion }}</p>
+              <p class="mb-1">📞 {{ vet.telefono }}</p>
+              <a class="small" href="mailto:{{ vet.email }}">{{ vet.email }}</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info mt-3">
+      Aún no tienes veterinarios favoritos ❤️
+    </div>
+  {% endif %}
+</div>
+
+<script>
+function toggleFavorite(vetId, el) {
+  fetch(`/toggle-favorite/${vetId}/`, {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (!data.is_favorite) {
+      // remove card if unfavorited
+      el.closest('.col-12').remove();
+      if (document.querySelectorAll('.card').length === 0) {
+        document.querySelector('.container').innerHTML +=
+          '<div class="alert alert-info mt-3">Aún no tienes veterinarios favoritos ❤️</div>';
+      }
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}
