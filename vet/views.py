@@ -11,6 +11,9 @@ from .models import Veterinario, Perfil
 
 @login_required
 def edit_profile(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
     # Obtener o crear el perfil asociado al usuario
     try:
         perfil = request.user.perfil
@@ -21,7 +24,9 @@ def edit_profile(request):
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
-            form.save()
+            perfil = form.save(commit=False)
+            perfil.usuario = request.user
+            perfil.save()
             return redirect('home')
     else:
         form = ProfileForm(instance=perfil)
@@ -29,6 +34,12 @@ def edit_profile(request):
     return render(request, "edit_profile.html", {"form": form})
 
 
+
+from django.contrib.auth import logout
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 # Vista para registro básico
 def signup(request):

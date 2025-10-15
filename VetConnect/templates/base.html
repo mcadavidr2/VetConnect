@@ -4,20 +4,163 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VetConnect</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+  <style>
+    /* Estilos base */
+    :root {
+      --primary-color: #212529;
+      --hover-color: #424649;
+      --text-color: #212529;
+    }
+
+    body {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* Navbar y elementos de navegación */
+    .navbar {
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--text-color) !important;
+    }
+
+    .navbar-nav .nav-link,
+    .dropdown-item {
+      color: var(--text-color) !important;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover,
+    .navbar-brand:hover,
+    .dropdown-item:hover {
+      color: var(--hover-color) !important;
+      background-color: rgba(0,0,0,0.05);
+    }
+
+    /* Botones */
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--hover-color);
+      border-color: var(--hover-color);
+    }
+
+    .btn-outline-primary {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    /* Dropdown menu */
+    .dropdown-menu {
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .dropdown-item {
+      padding: 0.75rem 1.5rem;
+    }
+
+    /* Contenedor principal */
+    .container {
+      padding: 1rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Media Queries para diferentes tamaños de pantalla */
+    /* Móviles pequeños */
+    @media (max-width: 576px) {
+      body {
+        font-size: 14px;
+      }
+      .navbar-brand {
+        font-size: 1.2rem;
+      }
+      .container {
+        padding: 0.5rem;
+      }
+      .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    /* Tablets */
+    @media (min-width: 577px) and (max-width: 991px) {
+      .navbar-nav {
+        padding: 0.5rem 0;
+      }
+      .nav-link {
+        padding: 0.5rem;
+      }
+    }
+
+    /* Pantallas grandes */
+    @media (min-width: 992px) {
+      .navbar {
+        padding: 1rem 2rem;
+      }
+      .container {
+        padding: 2rem;
+      }
+    }
+
+    /* Pantallas muy grandes */
+    @media (min-width: 1400px) {
+      body {
+        font-size: 18px;
+      }
+      .container {
+        padding: 2rem 4rem;
+      }
+    }
+
+    /* Ajustes de accesibilidad */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'home' %}">VetConnect</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+        VetConnect
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'chat' %}">Chat</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
@@ -26,13 +169,18 @@
         </ul>
         <ul class="navbar-nav ms-auto me-3">
           {% if request.user.is_authenticated %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ request.user.username }}</a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ request.user.username }}
+              </button>
+              <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{% url 'profile' %}">Editar perfil</a></li>
-                <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="document.getElementById('logout-form').submit();">Cerrar sesión</a></li>
               </ul>
-            </li>
+              <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+                {% csrf_token %}
+              </form>
+            </div>
           {% else %}
             <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Registrarse</a></li>
@@ -48,6 +196,11 @@
     {% block content %}
     {% endblock %}
   </div>
+
+  <!-- Scripts de Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
 </body>
 </html>
