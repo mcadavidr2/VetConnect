@@ -1,66 +1,246 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 {% block content %}
-<div class="container py-5">
+
+<!-- ===== Estilos específicos de esta vista (puedes moverlos a /static/css/signup.css) ===== -->
+<style>
+  :root{
+    --teal-600:#4d8f8a;
+    --teal-500:#6ba7a2;
+    --teal-50:#eef6f5;
+    --ink-700:#1f2937;
+    --ink-500:#6b7280;
+  }
+
+  /* Banda superior tipo “hero” */
+  .signup-hero{
+    background: var(--teal-50);
+    padding: 56px 0 ;
+    border-bottom: 1px solid rgba(0,0,0,.04);
+    margin-top: -55px;
+    width: 100vw;
+    left: -200px;
+    position: relative;
+    
+  }
+  .signup-hero h1{
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--ink-700);
+  }
+  .signup-hero p{
+    color: var(--ink-500);
+    max-width: 56ch;
+  }
+
+  /* Card central */
+  .register-card{
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(20,30,60,.08);
+  }
+  .register-title{
+    font-weight: 700;
+    color: var(--ink-700);
+  }
+  .register-subtitle{
+    color: var(--ink-500);
+  }
+
+  /* Inputs y labels */
+  .form-label{
+    font-weight: 600;
+    color: var(--ink-700);
+  }
+  .form-control{
+    border-radius: 12px;
+    height: 46px;
+  }
+  .form-control:focus{
+    border-color: var(--teal-500);
+    box-shadow: 0 0 0 .2rem rgba(107,167,162,.15);
+  }
+
+  /* Botón principal */
+  .btn-primary{
+    --bs-btn-bg: var(--teal-600);
+    --bs-btn-border-color: var(--teal-600);
+    --bs-btn-hover-bg: #3f7c78;
+    --bs-btn-hover-border-color: #3f7c78;
+    border-radius: 12px;
+    height: 48px;
+  }
+
+  /* Segmentado para tipo de cuenta (sin romper el <select>) */
+  .segmented{
+    display: inline-flex;
+    gap: 8px;
+    padding: 6px;
+    background: #f5f7f7;
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: 999px;
+  }
+  .segmented .seg-btn{
+    border: 0;
+    background: transparent;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    color: var(--ink-700);
+    line-height: 1;
+  }
+  .segmented .seg-btn.active{
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(20,30,60,.08);
+    color: var(--teal-600);
+    border: 1px solid rgba(0,0,0,.05);
+  }
+
+  /* Chips de confianza (opcionales, decorativos) */
+  .trust-chips{
+    display:flex; gap:.5rem; justify-content:center; flex-wrap:wrap;
+  }
+  .trust-chips .chip{
+    font-size:.8rem; color:#6b7280; background:#f7faf9; border:1px solid #edf2f1;
+    padding:.35rem .6rem; border-radius:999px;
+  }
+
+  /* Separación global para que la card “respire” */
+  .signup-wrapper{ padding: 48px 0 72px; }
+
+
+</style>
+
+<!-- ===== HERO (título y subtítulo como en el mockup) ===== -->
+<section class="signup-hero">
+  <div class="container">
+    <h1 class="display-5 mb-2">Encuentra un veterinario de confianza cerca de ti—rápido.</h1>
+    <p class="lead mb-0">
+      Reserva con profesionales verificados, mira disponibilidad en tiempo real y compara precios claros para el cuidado de tu mascota.
+    </p>
+  </div>
+</section>
+
+<!-- ===== FORMULARIO ===== -->
+<div class="container signup-wrapper">
   <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
-      <div class="card shadow-sm border-0" style="border-radius:18px;">
-        <div class="card-body p-4">
-          <h2 class="text-center mb-3" style="font-weight:600;">Crear tu cuenta</h2>
-          <p class="text-center text-secondary mb-4">Regístrate para acceder a VetConnect</p>
+      <div class="card register-card">
+        <div class="card-body p-4 p-md-4">
+          <h2 class="text-center register-title mb-2">Crear tu cuenta</h2>
+          <p class="text-center register-subtitle mb-4">Regístrate para acceder a VetConnect</p>
+
+          <!-- Segmentado visual que controla el select tipo_cuenta (no rompe la lógica) -->
+          <div class="d-flex justify-content-center mb-3">
+            <div class="segmented" id="tipoCuentaSegmented" role="tablist" aria-label="Tipo de cuenta">
+              <button type="button" class="seg-btn active" data-value="usuario" role="tab">Soy usuario</button>
+              <button type="button" class="seg-btn" data-value="veterinario" role="tab">Soy veterinario</button>
+            </div>
+          </div>
+
           <form method="post" autocomplete="off" enctype="multipart/form-data">
             {% csrf_token %}
+
+            <!-- Username -->
             <div class="mb-3">
               <label class="form-label">{{ form.username.label }}</label>
               {{ form.username|add_class:"form-control" }}
             </div>
+
+            <!-- Email -->
             <div class="mb-3">
               <label class="form-label">{{ form.email.label }}</label>
-              {{ form.email|add_class:'form-control' }}
+              {{ form.email|add_class:"form-control" }}
             </div>
+
+            <!-- Password -->
             <div class="mb-3">
               <label class="form-label">{{ form.password.label }}</label>
-              {{ form.password|add_class:'form-control' }}
+              {{ form.password|add_class:"form-control" }}
             </div>
+
+            <!-- Password 2 -->
             <div class="mb-3">
               <label class="form-label">{{ form.password2.label }}</label>
-              {{ form.password2|add_class:'form-control' }}
+              {{ form.password2|add_class:"form-control" }}
             </div>
+
+            <!-- Select de tipo de cuenta: se mantiene, pero lo escondemos visualmente (accesible) -->
             <div class="mb-3">
               <label class="form-label">{{ form.tipo_cuenta.label }}</label>
-              {{ form.tipo_cuenta|add_class:'form-control' }}
+              {{ form.tipo_cuenta|add_class:"form-control"|attr:"aria-describedby:ayuda-tipo" }}
+              <div id="ayuda-tipo" class="form-text">Este valor se sincroniza con los botones de arriba.</div>
             </div>
+
+            <!-- Cédula -->
             <div class="mb-3">
               <label class="form-label">{{ form.cedula.label }}</label>
-              {{ form.cedula|add_class:'form-control' }}
+              {{ form.cedula|add_class:"form-control" }}
             </div>
+
+            <!-- Campos exclusivos de veterinario (tu lógica existente) -->
             <div id="campos-veterinario" style="display:none;">
               <div class="mb-3">
                 <label class="form-label">{{ form.certificado.label }}</label>
-                {{ form.certificado|add_class:'form-control' }}
+                {{ form.certificado|add_class:"form-control" }}
               </div>
               <div class="mb-3">
                 <label class="form-label">{{ form.ubicacion_trabajo.label }}</label>
-                {{ form.ubicacion_trabajo|add_class:'form-control' }}
+                {{ form.ubicacion_trabajo|add_class:"form-control" }}
               </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100" style="font-weight:500;font-size:1.1rem;">Registrarse</button>
+
+            <button type="submit" class="btn btn-primary w-100 mt-2" style="font-weight:600;font-size:1.05rem;">Registrarse</button>
           </form>
+
+          <!-- Mantengo tu JS y agrego sync del segmentado con el <select> -->
           <script>
             const tipoCuenta = document.getElementById('id_tipo_cuenta');
             const camposVet = document.getElementById('campos-veterinario');
+
             function mostrarCamposVet() {
               if (tipoCuenta.value === 'veterinario') {
                 camposVet.style.display = '';
+                // Activar botón “veterinario”
+                document.querySelectorAll('#tipoCuentaSegmented .seg-btn').forEach(b=>b.classList.remove('active'));
+                document.querySelector('#tipoCuentaSegmented .seg-btn[data-value="veterinario"]').classList.add('active');
               } else {
                 camposVet.style.display = 'none';
+                // Activar botón “usuario”
+                document.querySelectorAll('#tipoCuentaSegmented .seg-btn').forEach(b=>b.classList.remove('active'));
+                document.querySelector('#tipoCuentaSegmented .seg-btn[data-value="usuario"]').classList.add('active');
               }
             }
             tipoCuenta.addEventListener('change', mostrarCamposVet);
-            window.addEventListener('DOMContentLoaded', mostrarCamposVet);
+            window.addEventListener('DOMContentLoaded', () => {
+              // Si el select viene con valor por defecto, reflejarlo
+              mostrarCamposVet();
+
+              // Clicks del segmentado -> cambian el select (sin romper validaciones/POST)
+              document.querySelectorAll('#tipoCuentaSegmented .seg-btn').forEach(btn=>{
+                btn.addEventListener('click', ()=>{
+                  const val = btn.getAttribute('data-value');
+                  if (tipoCuenta.value !== val) {
+                    tipoCuenta.value = val;
+                    tipoCuenta.dispatchEvent(new Event('change'));
+                  } else {
+                    // toggle visual
+                    mostrarCamposVet();
+                  }
+                });
+              });
+            });
           </script>
+
           <div class="text-center mt-3">
             <a href="/" class="text-decoration-none">Volver al inicio</a>
+          </div>
+
+          <!-- Chips de confianza (decorativos) -->
+          <div class="trust-chips mt-3">
+            <span class="chip">⭐ 4.8 de calificación</span>
+            <span class="chip">⏱️ Disponibilidad en tiempo real</span>
+            <span class="chip">💳 Precios transparentes</span>
           </div>
         </div>
       </div>
@@ -68,6 +248,4 @@
   </div>
 </div>
 
-{% comment %} Filtro para agregar clase a los campos del formulario {% endcomment %}
-{% load widget_tweaks %}
 {% endblock %}

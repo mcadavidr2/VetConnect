@@ -1,178 +1,157 @@
-<!DOCTYPE html>
 {% extends "base.html" %}
-{% block content%}
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About VetConnect</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f9fafb;
-      color: #333;
-      line-height: 1.6;
-    }
+{% block content %}
 
-    header {
-      background: #1e3a8a;
-      color: white;
-      padding: 2rem 1rem;
-      text-align: center;
-    }
+<style>
+  :root{
+    --teal-600:#4d8f8a;
+    --teal-500:#6ba7a2;
+    --teal-50:#eef6f5;
+    --ink-800:#111827;
+    --ink-600:#374151;
+    --ink-500:#6b7280;
+  }
 
-    header h1 {
-      margin: 0;
-      font-size: 2.5rem;
-    }
+  /* ===== HERO full-bleed, pegado al navbar ===== */
+  .about-hero{
+    background: var(--teal-50);
+    padding: 56px 0;
+    border-bottom: 1px solid rgba(0,0,0,.05);
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    width: 100vw; max-width: 100vw;
+    margin-top: -55px;
+  }
+  .about-hero h1{
+    font-weight: 800; letter-spacing: -.02em; color: var(--ink-800);
+  }
+  .about-hero p{
+    color: var(--ink-500); margin: .25rem 0 0 0; max-width: 70ch;
+  }
 
-    header p {
-      margin: 0.5rem 0 0;
-      font-size: 1.2rem;
-    }
+  /* ===== Secciones ===== */
+  .about-container{ padding: 48px 0 80px; }
+  .about-section{ margin-bottom: 2.5rem; }
+  .about-section h2{
+    font-size: 1.5rem; font-weight: 800; color: var(--ink-800);
+    margin-bottom: .75rem;
+  }
+  .about-section .sub{
+    color: var(--ink-500); margin-top: -.25rem; margin-bottom: 1rem;
+  }
 
-    main {
-      max-width: 1000px;
-      margin: auto;
-      padding: 2rem 1rem;
-    }
+  /* Lista con “tarjetas” compactas */
+  .feature-list{ list-style: none; padding-left: 0; margin: 0; }
+  .feature-list li{
+    background: #fff;
+    margin: .4rem 0;
+    padding: .75rem 1rem;
+    border: 1px solid #eef2f7;
+    border-left: 4px solid var(--teal-600);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(20,30,60,.04);
+    color: var(--ink-600);
+  }
 
-    section {
-      margin-bottom: 2.5rem;
-    }
+  /* Grid del equipo */
+  .team{
+    display: grid; gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .team-card{
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 14px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 10px 24px rgba(20,30,60,.06);
+    transition: transform .2s ease;
+  }
+  .team-card:hover{ transform: translateY(-4px); }
+  .team-card h3{
+    margin: .5rem 0 .25rem; font-size: 1.1rem; color: var(--ink-800); font-weight: 700;
+  }
+  .team-card p{ margin: .15rem 0; color: var(--ink-600); }
+  .team-card a{ text-decoration: none; color: var(--teal-600); }
 
-    h2 {
-      color: #1e3a8a;
-      margin-bottom: 1rem;
-      font-size: 1.8rem;
-      border-bottom: 2px solid #e5e7eb;
-      padding-bottom: 0.5rem;
-    }
+  /* Footer interno suave (si no usas el global) */
+  .about-footer{
+    border-top: 1px solid #eef2f7;
+    color: var(--ink-500);
+    padding-top: 1.25rem;
+    margin-top: 2rem;
+    text-align: center;
+  }
+</style>
 
-    ul {
-      list-style: none;
-      padding: 0;
-    }
+<!-- ===== HERO ===== -->
+<section class="about-hero">
+  <div class="container">
+    <h1 class="display-6 mb-1">Acerca de VetConnect</h1>
+    <p>Conectamos tutores de mascotas con veterinarios verificados: disponibilidad en tiempo real, precios transparentes y atención en casa o en clínica.</p>
+  </div>
+</section>
 
-    ul li {
-      background: #ffffff;
-      margin: 0.4rem 0;
-      padding: 0.8rem 1rem;
-      border-left: 4px solid #1e3a8a;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
+<!-- ===== CONTENIDO ===== -->
+<div class="container about-container">
 
-    .team {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
-    }
+  <section class="about-section">
+    <h2>Características clave</h2>
+    <p class="sub">Todo lo que necesitas para una experiencia simple y confiable.</p>
+    <ul class="feature-list">
+      <li>Registro y autenticación de usuarios</li>
+      <li>Elección del lugar de atención (domicilio o clínica)</li>
+      <li>Selección de veterinario(a) preferido(a)</li>
+      <li>Chat en tiempo real con el profesional</li>
+      <li>Servicio de entrega de medicamentos</li>
+      <li>Prediagnóstico asistido por IA</li>
+      <li>Navegación de servicios sin registro</li>
+      <li>Muestra de veterinarios cercanos</li>
+      <li>Historial de consultas y registros</li>
+    </ul>
+  </section>
 
-    .team-member {
-      background: #ffffff;
-      padding: 1rem;
-      border-radius: 8px;
-      text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
-    }
+  <section class="about-section">
+    <h2>Resumen técnico</h2>
+    <p class="sub">Arquitectura ligera y segura para escalar sin fricción.</p>
+    <ul class="feature-list">
+      <li><strong>Interfaces del sistema:</strong> Google Maps API, pasarelas de pago, módulos de IA</li>
+      <li><strong>Interfaces de usuario:</strong> Diseño responsive (PC, tablet, smartphone)</li>
+      <li><strong>Interfaces de hardware:</strong> Funciona en navegadores modernos</li>
+      <li><strong>Interfaces de software:</strong> Backend en Django; frontend adaptable (Bootstrap/Tailwind)</li>
+      <li><strong>Comunicación:</strong> HTTPS y buenas prácticas de seguridad</li>
+      <li><strong>Rendimiento:</strong> Liviano, ~&lt;200 MB de RAM</li>
+    </ul>
+  </section>
 
-    .team-member:hover {
-      transform: translateY(-5px);
-    }
-
-    .team-member h3 {
-      margin: 0.5rem 0;
-      font-size: 1.2rem;
-      color: #1e3a8a;
-    }
-
-    .team-member p {
-      margin: 0.2rem 0;
-      font-size: 0.95rem;
-    }
-
-    footer {
-      background: #1e3a8a;
-      color: white;
-      text-align: center;
-      padding: 1.5rem 1rem;
-      margin-top: 2rem;
-    }
-
-    footer p {
-      margin: 0;
-      font-size: 0.9rem;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>About VetConnect</h1>
-    <p>Connecting pet owners with certified veterinarians, anytime, anywhere.</p>
-  </header>
-
-  <main>
-    <section>
-      <h2>Key Features</h2>
-      <ul>
-        <li>User registration and authentication</li>
-        <li>Choose treatment location (home or clinic)</li>
-        <li>Select preferred veterinarian</li>
-        <li>Real-time chat with veterinarian</li>
-        <li>Medicine delivery service</li>
-        <li>AI-powered pre-diagnosis</li>
-        <li>Browse services without registration</li>
-        <li>Display nearby veterinarians</li>
-        <li>Maintain historical consultation records</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Technical Overview</h2>
-      <ul>
-        <li><strong>System Interfaces:</strong> Google Maps API, payment gateways, AI modules</li>
-        <li><strong>User Interfaces:</strong> Responsive design (PC, tablet, smartphone)</li>
-        <li><strong>Hardware Interfaces:</strong> Runs on any modern browser</li>
-        <li><strong>Software Interfaces:</strong> Django backend, React frontend, Tailwind CSS</li>
-        <li><strong>Communication Interfaces:</strong> Secure HTTPS protocols</li>
-        <li><strong>Performance:</strong> Lightweight, requires &lt;200MB RAM</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Our Team</h2>
-      <div class="team">
-        <div class="team-member">
-          <h3>Mateo Cadavid</h3>
-          <p><em>Scrum Master / Developer</em></p>
-          <p><a href="https://github.com/Mcadavidr2" target="_blank">GitHub: Mcadavidr2</a></p>
-        </div>
-        <div class="team-member">
-          <h3>Emilton Mena</h3>
-          <p><em>Developer</em></p>
-          <p><a href="https://github.com/Emilton" target="_blank">GitHub: Emilton</a></p>
-        </div>
-        <div class="team-member">
-          <h3>Alejandro Sepúlveda</h3>
-          <p><em>Developer</em></p>
-          <p><a href="https://github.com/AlejandroSPosada" target="_blank">GitHub: AlejandroSPosada</a></p>
-        </div>
-        <div class="team-member">
-          <h3>Juan Andrés Salcedo</h3>
-          <p><em>Developer</em></p>
-          <p><a href="https://github.com/Salcedo0" target="_blank">GitHub: Salcedo0</a></p>
-        </div>
+  <section class="about-section">
+    <h2>Nuestro equipo</h2>
+    <div class="team">
+      <div class="team-card">
+        <h3>Mateo Cadavid</h3>
+        <p><em>Scrum Master / Developer</em></p>
+        <p><a href="https://github.com/Mcadavidr2" target="_blank" rel="noopener">GitHub: Mcadavidr2</a></p>
       </div>
-    </section>
-  </main>
+      <div class="team-card">
+        <h3>Emilton Mena</h3>
+        <p><em>Developer</em></p>
+        <p><a href="https://github.com/Emilton" target="_blank" rel="noopener">GitHub: Emilton</a></p>
+      </div>
+      <div class="team-card">
+        <h3>Alejandro Sepúlveda</h3>
+        <p><em>Developer</em></p>
+        <p><a href="https://github.com/AlejandroSPosada" target="_blank" rel="noopener">GitHub: AlejandroSPosada</a></p>
+      </div>
+      <div class="team-card">
+        <h3>Juan Andrés Salcedo</h3>
+        <p><em>Developer</em></p>
+        <p><a href="https://github.com/Salcedo0" target="_blank" rel="noopener">GitHub: Salcedo0</a></p>
+      </div>
+    </div>
+  </section>
 
-  <footer>
-    <p>&copy; 2025 VetConnect. All rights reserved.</p>
-  </footer>
-</body>
-</html>
+  <div class="about-footer">
+    © 2025 VetConnect. Todos los derechos reservados.
+  </div>
+</div>
+
 {% endblock %}

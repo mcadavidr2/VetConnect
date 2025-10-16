@@ -41,6 +41,9 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
+def logout_page(request):
+    return render(request, 'logout.html')
+
 # Vista para registro básico
 def signup(request):
     if request.method == 'POST':

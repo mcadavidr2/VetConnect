@@ -1,141 +1,230 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Veterinarios Cercanos</title>
+<!-- Tip: si Bootstrap ya viene en base.html, puedes quitar este link -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <style>
-    .card{border-radius:16px}
-    .distance{font-size:.9rem}
-  </style>
-</head>
-<body class="bg-body">
+<!-- Hoja de estilos propia -->
+<link href="{% static 'Styles/home.css' %}" rel="stylesheet">
+
+<main class="home-hero-wrapper bg-body">
+
+  <!-- HERO -->
+  <section class="container-xxl py-5 hero">
+    <div class="row g-5 align-items-center">
+      <!-- Columna izquierda: texto -->
+      <div class="col-12 col-lg-6">
+        <span class="badge text-bg-light mb-3">VetConnect</span>
+        <h1 class="display-5 fw-bold hero-title">
+          Encuentra un <span style="color: #77A6A6;">veterinario</span> de confianza
+          cerca de ti <span style="color: #77A6A6;">rápido</span>.
+        </h1>
+        <p class="lead text-secondary mt-3">
+          Ve clínicas cercanas, disponibilidad en tiempo real, reseñas,
+          credenciales y precios claros—todo desde tu teléfono.
+        </p>
+        <p class="small text-success-emphasis mt-2">
+          Porque tu mascota no es solo un animal—es familia.
+        </p>
+
+        <!-- Chips de valor -->
+        <div class="d-flex flex-wrap gap-3 align-items-center mt-4">
+          <div class="d-inline-flex align-items-center gap-2 text-secondary">
+            ⭐⭐⭐⭐⭐ <span class="fw-medium">4.8 de calificación</span>
+          </div>
+          <div class="d-inline-flex align-items-center gap-2 text-secondary">
+            ⏱️ <span class="fw-medium">Disponibilidad en tiempo real</span>
+          </div>
+          <div class="d-inline-flex align-items-center gap-2 text-secondary">
+            💳 <span class="fw-medium">Precios transparentes</span>
+          </div>
+        </div>
+
+        <!-- Botones de “store” (decorativos) -->
+        <!-- <div class="d-flex flex-wrap gap-2 mt-4">
+          <a class="btn btn-teal" href="#" role="button">Descargar en App Store</a>
+          <a class="btn btn-outline-teal" href="#" role="button">Obtener en Google Play</a>
+        </div> -->
+      </div>
+
+      <!-- Columna derecha: imagen + tarjeta de búsqueda -->
+      <div class="col-12 col-lg-6">
+        <div class="hero-figure position-relative">
+          <!-- Imagen; cambia por tu propio asset si quieres -->
+          <img
+            src="{% static 'img/HeroSection.jpg' %}"
+            alt="Persona con perro en clínica veterinaria"
+            class="img-fluid rounded-4 shadow-sm w-100 hero-img"
+            style="position: relative; object-fit: cover;"
+          />
 
 
+          <!-- Ta</picture>rjeta de búsqueda (contiene tus mismos controles/IDs) -->
+          <div class="search-card card shadow-lg border-0"
+          style="position: absolute; bottom: -120px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1000px;">
 
-  <main class="container py-4">
-    <h1 class="h3 mb-1">Veterinarios Cercanos</h1>
-    <p class="text-secondary">Descubre clínicas cerca de tu ubicación.</p>
-
-
-    <div class="d-flex gap-2 align-items-center mb-3">
-      <button id="btnUbicacion" class="btn btn-primary">Usar mi ubicación</button>
-  <a href="{% url 'veterinarios_list' %}" class="btn btn-outline-primary">Ver listado completo</a>
-      <input type="text" id="inputDireccion" class="form-control" style="max-width:250px" placeholder="Buscar por ciudad o dirección">
-  <button id="btnBuscarDireccion" class="btn btn-primary">Buscar</button>
-      <div id="estado" class="small text-secondary"></div>
-    </div>
-
-    <div id="spinner" class="d-none text-center py-4">
-      <div class="spinner-border" role="status"></div>
-      <div class="small mt-2">Calculando distancias…</div>
-    </div>
-
-    <div id="lista" class="row g-3"></div>
-  </main>
-
-  <script>
-    const ENDPOINT = "{% url 'veterinarios_cercanos' %}";
-    const lista = document.getElementById('lista');
-    const estado = document.getElementById('estado');
-    const spinner = document.getElementById('spinner');
-    const btn = document.getElementById('btnUbicacion');
-
-    function getCookie(name){
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if(parts.length === 2) return parts.pop().split(';').shift();
-    }
-
-    function pintar(vets){
-      lista.innerHTML = '';
-      if(!vets.length){
-        lista.innerHTML = '<div class="col-12"><div class="alert alert-warning">No se encontraron veterinarios.</div></div>';
-        return;
-      }
-      // Ordenados por distancia si viene en el JSON
-      vets.forEach(v=>{
-        const col = document.createElement('div');
-        col.className = 'col-12 col-md-6 col-lg-4';
-        col.innerHTML = `
-          <div class="card h-100 shadow-sm">
             <div class="card-body">
-              <h2 class="h5 mb-2">${v.nombre}</h2>
-              <p class="mb-1">${v.direccion}</p>
-              <p class="mb-1">📞 ${v.telefono}</p>
-              <a class="small" href="mailto:${v.email}">${v.email}</a>
-              ${v.distancia !== undefined ? `<div class="text-secondary distance mt-2">≈ ${v.distancia.toFixed(2)} km</div>` : ''}
+              <h2 class="h5 mb-3">Busca un veterinario ahora</h2>
+
+              <div class="mb-2">
+                <label for="inputDireccion" class="form-label mb-1">Ubicación</label>
+                <div class="d-flex gap-2">
+                  <input type="text" id="inputDireccion" class="form-control" placeholder="Ciudad o dirección">
+                  <button id="btnBuscarDireccion" class="btn btn-primary" style="background-color: #77A6A6;">Buscar</button>
+                </div>
+                <button id="btnUbicacion" class="btn btn-link px-0 mt-1" style="text-decoration: none; color: #4d8f8a;">Usar mi ubicación actual</button>
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 mt-2">
+                <a href="{% url 'veterinarios_list' %}" class="btn btn-outline-primary" style="background-color: #77A6A6; color: white;">Ver listado completo</a>
+              </div>
+
+              <div id="estado" class="small text-secondary mt-2" role="status" aria-live="polite"></div>
             </div>
-          </div>`;
-        lista.appendChild(col);
-      });
-    }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <style>
+  :root{
+    --teal-600:#4d8f8a;
+    --teal-500:#6ba7a2;
+    --ink-800:#111827;
+    --ink-600:#374151;
+    --ink-500:#6b7280;
+  }
 
-    function consultar(lat, lon){
-      spinner.classList.remove('d-none');
-      estado.textContent = '';
-      fetch(ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({ latitud: lat, longitud: lon })
+  /* === Cards inyectadas por JS en el home === */
+  #lista .card{
+    border:1px solid #eef2f7 !important;
+    border-radius:16px !important;
+    box-shadow:0 10px 24px rgba(20,30,60,.06) !important;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  #lista .card:hover{
+    transform: translateY(-2px);
+    box-shadow:0 18px 40px rgba(20,30,60,.10) !important;
+  }
+  #lista .card .card-body{ padding:1rem 1.1rem; }
+  #lista h2{ font-weight:700; color:var(--ink-800); }
+  #lista p{ color:var(--ink-600); margin-bottom:.35rem; }
+  #lista a{ color:var(--teal-600); text-decoration: underline; }
+  #lista .distance{ font-size:.9rem; color:var(--ink-500); }
+</style>
+
+  <!-- Spinner global -->
+  <div id="spinner" class="d-none text-center py-4">
+    <div class="spinner-border" role="status" aria-label="Cargando"></div>
+    <div class="small mt-2">Calculando distancias…</div>
+  </div>
+
+  <!-- Resultados -->
+  <section class="container-xxl py-5">
+    <h3 class="h4 mb-3">Resultados cercanos</h3>
+    <div id="lista" class="row g-3"></div>
+  </section>
+
+</main>
+
+<!-- JS existente (intacto) -->
+<script>
+  const ENDPOINT = "{% url 'veterinarios_cercanos' %}";
+  const lista = document.getElementById('lista');
+  const estado = document.getElementById('estado');
+  const spinner = document.getElementById('spinner');
+  const btn = document.getElementById('btnUbicacion');
+
+  function getCookie(name){
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if(parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  function pintar(vets){
+    lista.innerHTML = '';
+    if(!vets.length){
+      lista.innerHTML = '<div class="col-12"><div class="alert alert-warning">No se encontraron veterinarios.</div></div>';
+      return;
+    }
+    vets.forEach(v=>{
+      const col = document.createElement('div');
+      col.className = 'col-12 col-md-6 col-lg-4';
+      col.innerHTML = `
+        <div class="card h-100 shadow-sm clinic-card">
+          <div class="card-body">
+            <h2 class="h5 mb-2">${v.nombre}</h2>
+            <p class="mb-1">${v.direccion}</p>
+            <p class="mb-1">📞 ${v.telefono}</p>
+            <a class="small" href="mailto:${v.email}">${v.email}</a>
+            ${v.distancia !== undefined ? `<div class="text-secondary distance mt-2">≈ ${v.distancia.toFixed(2)} km</div>` : ''}
+          </div>
+        </div>`;
+      lista.appendChild(col);
+    });
+  }
+
+  function consultar(lat, lon){
+    spinner.classList.remove('d-none');
+    estado.textContent = '';
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ latitud: lat, longitud: lon })
+    })
+    .then(r => r.ok ? r.json() : Promise.reject(r))
+    .then(data => { pintar(data); })
+    .catch(()=> { estado.textContent = 'No se pudo obtener la lista.'; })
+    .finally(()=> spinner.classList.add('d-none'));
+  }
+
+  btn.addEventListener('click', ()=>{
+    if(!navigator.geolocation){
+      estado.textContent = 'Tu navegador no soporta geolocalización.';
+      return;
+    }
+    estado.textContent = 'Obteniendo ubicación…';
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        estado.textContent = 'Ordenando por cercanía…';
+        consultar(pos.coords.latitude, pos.coords.longitude);
+      },
+      () => { estado.textContent = 'Ubicación denegada. Puedes usar el campo de dirección o ver el listado completo.'; }
+    );
+  });
+
+  document.getElementById('btnBuscarDireccion').addEventListener('click', ()=>{
+    const direccion = document.getElementById('inputDireccion').value.trim();
+    if(!direccion){
+      estado.textContent = 'Ingresa una ciudad o dirección.';
+      return;
+    }
+    estado.textContent = 'Buscando dirección…';
+    spinner.classList.remove('d-none');
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccion)}`)
+      .then(r => r.json())
+      .then(data => {
+        if(data.length === 0){
+          estado.textContent = 'No se encontró la dirección.';
+          spinner.classList.add('d-none');
+          return;
+        }
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        estado.textContent = 'Ordenando por cercanía…';
+        consultar(lat, lon);
       })
-      .then(r => r.ok ? r.json() : Promise.reject(r))
-      .then(data => { pintar(data); })
-      .catch(()=> { estado.textContent = 'No se pudo obtener la lista.'; })
+      .catch(()=>{
+        estado.textContent = 'Error buscando dirección.';
+      })
       .finally(()=> spinner.classList.add('d-none'));
-    }
+  });
+</script>
 
-    btn.addEventListener('click', ()=>{
-      if(!navigator.geolocation){
-        estado.textContent = 'Tu navegador no soporta geolocalización.';
-        return;
-      }
-      estado.textContent = 'Obteniendo ubicación…';
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          estado.textContent = 'Ordenando por cercanía…';
-          consultar(pos.coords.latitude, pos.coords.longitude);
-        },
-        () => { estado.textContent = 'Ubicación denegada. Muestra el listado completo en el enlace de arriba.'; }
-      );
-    });
-
-    // Buscar por dirección o ciudad usando Nominatim
-    document.getElementById('btnBuscarDireccion').addEventListener('click', ()=>{
-      const direccion = document.getElementById('inputDireccion').value.trim();
-      if(!direccion){
-        estado.textContent = 'Ingresa una ciudad o dirección.';
-        return;
-      }
-      estado.textContent = 'Buscando dirección…';
-      spinner.classList.remove('d-none');
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccion)}`)
-        .then(r => r.json())
-        .then(data => {
-          if(data.length === 0){
-            estado.textContent = 'No se encontró la dirección.';
-            spinner.classList.add('d-none');
-            return;
-          }
-          const lat = parseFloat(data[0].lat);
-          const lon = parseFloat(data[0].lon);
-          estado.textContent = 'Ordenando por cercanía…';
-          consultar(lat, lon);
-        })
-        .catch(()=>{
-          estado.textContent = 'Error buscando dirección.';
-        })
-        .finally(()=> spinner.classList.add('d-none'));
-    });
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-          crossorigin="anonymous"></script>
- {% endblock %}
+<!-- Bootstrap bundle (si no está ya en base.html) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

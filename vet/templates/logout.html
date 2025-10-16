@@ -1,0 +1,160 @@
+<style>
+  :root{
+    --teal-600:#4d8f8a;    
+    --teal-500:#6ba7a2;    
+    --ink-800:#0f172a;    
+    --ink-500:#64748b;     
+    --bg:#f5fbfa;          
+    --card:#ffffff;        
+  }
+
+
+  html, body{
+    height:100%;
+  }
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink-800);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+  }
+
+
+  h1{
+    margin:0 0 10px 0;
+    font-weight:800;
+    letter-spacing:-.02em;
+    text-align:center;
+  }
+  #status{
+    margin:0;
+    text-align:center;
+    color: var(--ink-500);
+  }
+
+  
+  body::before{
+    content:"";
+    position:fixed;
+    inset:auto;
+    width: min(560px, 92vw);
+    height: 180px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card);
+    border: 1px solid #e8eef0;
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(20,30,60,.10);
+    z-index: -1; 
+  }
+
+  
+  #status{
+    position:relative;
+    padding-top: 36px;       
+  }
+  #status::before{
+    content:"";
+    position:absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 3px solid #e6f0ef;
+    border-top-color: var(--teal-600);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin{ to { transform: translateX(-50%) rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){
+    #status::before{ animation:none; }
+  }
+
+
+  #status{
+    font-size: 0.98rem;
+  }
+
+  body::after{
+    content:"";
+    position:fixed;
+    top:0; left:0; right:0; height:8px;
+    background: linear-gradient(90deg, var(--teal-600), var(--teal-500));
+    opacity:.12;
+  }
+</style>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetConnect - Cerrar Sesión</title>
+</head>
+<body>
+    <h1>Cerrando sesión...</h1>
+    <p id="status">Por favor espera un momento</p>
+
+    <script>
+        // Función para obtener el CSRF token de las cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Función para hacer logout
+        async function performLogout() {
+            const csrftoken = getCookie('csrftoken');
+            const statusElement = document.getElementById('status');
+
+            try {
+                const response = await fetch('/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrftoken
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok || response.redirected) {
+                    statusElement.textContent = '¡Sesión cerrada exitosamente! Gracias por confiar en VetConnect';
+                    // Redirigir después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    statusElement.textContent = 'Error al cerrar sesión. Redirigiendo...';
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusElement.textContent = 'Error de conexión. Redirigiendo...';
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            }
+        }
+
+        // Ejecutar logout automáticamente al cargar la página
+        window.addEventListener('DOMContentLoaded', performLogout);
+    </script>
+</body>
+</html>

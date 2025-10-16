@@ -1,0 +1,75 @@
+
+:root{
+  --teal-600: #77A6A6;
+  --teal-500: #6ba7a2;
+  --teal-100: #e6f1f0;
+}
+.home-hero-wrapper{
+  overflow: clip;
+}
+
+.hero-title{
+  line-height: 1.1;
+}
+
+.btn-teal{
+  background: var(--teal-600);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: .7rem 1.1rem;
+}
+.btn-teal:hover{ filter: brightness(0.95); }
+
+.btn-outline-teal{
+  border: 1px solid var(--teal-600);
+  color: var(--teal-600);
+  border-radius: 999px;
+  padding: .7rem 1.1rem;
+}
+.btn-outline-teal:hover{
+  background: var(--teal-100);
+}
+
+/* Figura con imagen y tarjeta superpuesta */
+.hero-figure{
+  position: relative;
+  min-height: 360px;
+}
+.hero-img{
+  object-fit: cover;
+  height: 100%;
+  max-height: 520px;
+}
+
+/* Tarjeta de búsqueda estilo “floating” */
+.search-card{
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  border-radius: 1rem;
+  padding: .25rem;
+  background: #fff;
+}
+@media (min-width: 992px){
+  .search-card{
+    width: 88%;
+    left: 6%;
+    bottom: -1.2rem;
+  }
+}
+
+/* Cards de clínicas */
+.clinic-card{
+  border-radius: 16px;
+}
+.distance{
+  font-size: .9rem;
+  color: #6c757d;
+}
+
+/* Pequeños detalles */
+.badge.text-bg-light{
+  border: 1px solid #e7e7e7;
+}
