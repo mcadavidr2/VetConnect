@@ -1,2 +1,7 @@
-channels==4.3.1
-django-widget-tweaks
+Django==5.0.6
+django-widget-tweaks==1.5.0
+pillow==10.4.0
+requests==2.32.3
+tzdata==2024.1
+sqlparse==0.5.1
+asgiref==3.8.1
