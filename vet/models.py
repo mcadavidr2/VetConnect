@@ -21,6 +21,7 @@ class User(AbstractUser):
 class UserVet(User):
     certificado = models.FileField(upload_to='certificados/', blank=True, null=True)
     especializacion = models.CharField(max_length=200, blank=True, null=True)
+    recibir_emergencias = models.BooleanField(default=False)  # NEW FIELD
 
     def __str__(self):
         return f"{self.username}"

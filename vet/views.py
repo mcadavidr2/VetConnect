@@ -4,7 +4,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
-from .forms import SignUpForm, ProfileForm, VeterinaryServiceRequestForm
+from .forms import SignUpForm, VeterinaryServiceRequestForm, VetProfileForm
 from .models import User, UserPet, UserVet, Message, VeterinaryServiceRequest
 from math import radians, sin, cos, sqrt, atan2
 from django.db.models import Q
@@ -15,16 +15,20 @@ from django.views.decorators.http import require_POST
 
 @login_required
 def edit_profile(request):
-    user = request.user
 
-    # Use the right form and instance
-    form = ProfileForm(request.POST or None, request.FILES or None, instance=user)
+    # Use the right form depending on user type
+    if hasattr(request.user, 'uservet'):  # if the user is a vet
+        form = VetProfileForm(request.POST or None, request.FILES or None, instance=request.user.uservet)
+    else:
+        # normal user form if needed
+        form = VetProfileForm(request.POST or None, request.FILES or None, instance=request.user.uservet)
 
     if request.method == "POST" and form.is_valid():
         form.save()
         return redirect('home')
 
     return render(request, "edit_profile.html", {"form": form})
+
 
 
 def logout_view(request):

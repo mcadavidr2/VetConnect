@@ -57,14 +57,12 @@ class VeterinaryServiceRequestForm(forms.ModelForm):
             field.widget.attrs.update({'class': 'form-control'})
 
 
-class ProfileForm(forms.ModelForm):
+class VetProfileForm(forms.ModelForm):
+    recibir_emergencias = forms.BooleanField(
+        required=False,  # important! unchecked will not break validation
+        label="Recibir emergencias"
+    )
+
     class Meta:
-        model = UserPet
-        fields = [
-            'cedula',
-            'favoritos',
-        ]
-        widgets = {
-            'cedula': forms.TextInput(attrs={'class': 'form-control'}),
-            'favoritos': forms.SelectMultiple(attrs={'class': 'form-control'}),
-        }
+        model = UserVet
+        fields = ['cedula', 'direccion', 'telefono', 'certificado', 'especializacion', 'recibir_emergencias']
