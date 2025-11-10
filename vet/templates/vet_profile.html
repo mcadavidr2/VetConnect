@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+  <h1 class="h4 mb-3">Perfil del Veterinario</h1>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="h5">{{ vet.username }}</h2>
+      <p><strong>Nombre:</strong> {{ vet.first_name }} {{ vet.last_name }}</p>
+      <p><strong>Correo:</strong> {{ vet.email }}</p>
+      <p><strong>Teléfono:</strong> {{ vet.telefono }}</p>
+      <p><strong>Dirección:</strong> {{ vet.direccion }}</p>
+      <p><strong>Especialización:</strong> {{ vet.especializacion }}</p>
+
+      {% if vet.certificado %}
+        <p><strong>Certificado:</strong> <a href="{{ vet.certificado.url }}" target="_blank">Ver documento</a></p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

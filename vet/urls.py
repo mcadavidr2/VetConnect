@@ -19,5 +19,7 @@ urlpatterns = [
     path('toggle-favorite/<int:vet_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('favoritos/', views.mis_favoritos, name='mis_favoritos'),
     path('logout-page/', views.logout_page, name='logout_page'),
+    path('vet/profile/', views.vet_profile, name='vet_profile'),
+    path('vet/<int:vet_id>/', views.vet_detail, name='vet_detail'),
 ]
 

@@ -63,9 +63,6 @@ def signup(request):
             user.set_password(password)
             user.save()
 
-            # Loguear automáticamente después de registrarse
-            login(request, user)
-            messages.success(request, f'¡Bienvenido, {user.username}!')
             return redirect('home')
     else:
         form = SignUpForm()
@@ -144,7 +141,7 @@ def veterinarios_cercanos(request):
         lon_usuario = data.get('longitud')
 
         # Buscar veterinarios en la base de datos
-        veterinarios = Veterinario.objects.all()
+        veterinarios = UserVet.objects.all()
 
         # Lista para almacenar veterinarios cercanos
         veterinarios_cercanos = []
@@ -265,3 +262,18 @@ def mis_favoritos(request):
 
     veterinarios = user_pet.favoritos.all()
     return render(request, 'mis_favoritos.html', {'veterinarios': veterinarios})
+
+@login_required
+def vet_profile(request):
+    """Shows the logged veterinarian's profile."""
+    # ensure the user is a vet
+    if not hasattr(request.user, 'uservet'):
+        return redirect('home')  # or a 403 page if you prefer
+
+    vet = request.user.uservet
+
+    return render(request, 'vet_profile.html', {'vet': vet})
+
+def vet_detail(request, vet_id):
+    vet = get_object_or_404(UserVet, id=vet_id)
+    return render(request, 'vet_profile.html', {'vet': vet})

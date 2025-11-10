@@ -63,7 +63,6 @@
     <div class="row g-3">
       {% for vet in veterinarios.object_list %}
         <div class="col-12 col-md-6 col-lg-4">
-          <!-- añade 'vet-card' sin cambiar la lógica -->
           <div class="card h-100 shadow-sm position-relative vet-card">
             <div class="card-body">
               {% if user_pet %}
@@ -77,7 +76,15 @@
               <p class="mb-1">{{ vet.direccion }}</p>
               <p class="mb-1">Especialización: {{ vet.especializacion }}</p>
               <p class="mb-1">📞 {{ vet.telefono }}</p>
-              <a class="small" href="mailto:{% autoescape off %}{{ vet.email }}{% endautoescape %}">{{ vet.email }}</a>
+              <a class="small" href="mailto:{% autoescape off %}{{ vet.email }}{% endautoescape %}">
+                {{ vet.email }}
+              </a>
+              <div class="mt-3">
+                <a href="{% url 'vet_detail' vet.id %}" class="btn btn-outline-primary btn-sm">
+                  Ver perfil
+                </a>
+              </div>
+
             </div>
           </div>
         </div>
