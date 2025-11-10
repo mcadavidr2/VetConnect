@@ -1,33 +1,35 @@
 from django import forms
-from django.contrib.auth.models import User
-from .models import Perfil
+from .models import User, UserPet, UserVet, VeterinaryServiceRequest
 
 
-class SignUpForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, label='Password')
-    password2 = forms.CharField(widget=forms.PasswordInput, label='Password confirmation')
-    tipo_cuenta = forms.ChoiceField(
-        choices=[('usuario', 'Usuario'), ('veterinario', 'Veterinario')],
-        label='Tipo de cuenta',
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )
-    cedula = forms.CharField(label='Cédula / ID')
-    certificado = forms.FileField(label='Certificado', required=False)
-    ubicacion_trabajo = forms.CharField(label='Ubicación de trabajo', required=False)
+from django import forms
+from .models import UserVet, UserPet
 
-    class Meta:
-        model = User
-        fields = ('username', 'email')
+TIPO_CUENTA_CHOICES = [
+    ('usuario', 'Usuario'),
+    ('veterinario', 'Veterinario'),
+]
+
+class SignUpForm(forms.Form):
+    username = forms.CharField(max_length=150)
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
+    password2 = forms.CharField(widget=forms.PasswordInput, label="Confirmar contraseña")
+    tipo_cuenta = forms.ChoiceField(choices=TIPO_CUENTA_CHOICES)
+    cedula = forms.CharField(max_length=20)
+    certificado = forms.FileField(required=False)
+    especializacion = forms.CharField(required=False)
+    ubicacion_trabajo = forms.CharField(required=False)
 
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        password2 = cleaned_data.get('password2')
-        if password and password2 and password != password2:
-            self.add_error('password2', 'Las contraseñas no coinciden.')
+        p1 = cleaned_data.get("password")
+        p2 = cleaned_data.get("password2")
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError("Las contraseñas no coinciden.")
         return cleaned_data
-from django import forms
-from .models import VeterinaryServiceRequest
+
+
 
 class VeterinaryServiceRequestForm(forms.ModelForm):
     class Meta:
@@ -54,19 +56,15 @@ class VeterinaryServiceRequestForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
 
+
 class ProfileForm(forms.ModelForm):
     class Meta:
-        model = Perfil
+        model = UserPet
         fields = [
             'cedula',
-            'tipo_cuenta',
-            'certificado',
-            'ubicacion_trabajo'
+            'favoritos',
         ]
         widgets = {
             'cedula': forms.TextInput(attrs={'class': 'form-control'}),
-            'tipo_cuenta': forms.Select(attrs={'class': 'form-control'}),
-            'certificado': forms.FileInput(attrs={'class': 'form-control'}),
-            'ubicacion_trabajo': forms.TextInput(attrs={'class': 'form-control'}),
+            'favoritos': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
-

@@ -1,41 +1,31 @@
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .forms import SignUpForm
-from .forms import ProfileForm
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from .models import Veterinario, Perfil
+from django.utils import timezone
+from .forms import SignUpForm, ProfileForm, VeterinaryServiceRequestForm
+from .models import User, UserPet, UserVet, Message, VeterinaryServiceRequest
+from math import radians, sin, cos, sqrt, atan2
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import json, re
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
 
 @login_required
 def edit_profile(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-        
-    # Obtener o crear el perfil asociado al usuario
-    try:
-        perfil = request.user.perfil
-    except Exception:
-        Perfil = __import__('vet.models', fromlist=['Perfil']).Perfil
-        perfil = Perfil.objects.create(usuario=request.user, cedula='', tipo_cuenta='usuario')
+    user = request.user
 
-    if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=perfil)
-        if form.is_valid():
-            perfil = form.save(commit=False)
-            perfil.usuario = request.user
-            perfil.save()
-            return redirect('home')
-    else:
-        form = ProfileForm(instance=perfil)
+    # Use the right form and instance
+    form = ProfileForm(request.POST or None, request.FILES or None, instance=user)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect('home')
 
     return render(request, "edit_profile.html", {"form": form})
 
-
-
-from django.contrib.auth import logout
 
 def logout_view(request):
     logout(request)
@@ -44,43 +34,44 @@ def logout_view(request):
 def logout_page(request):
     return render(request, 'logout.html')
 
-# Vista para registro básico
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            # Crear Perfil asociado
             tipo = form.cleaned_data.get('tipo_cuenta')
-            cedula = form.cleaned_data.get('cedula')
-            certificado = form.cleaned_data.get('certificado')
-            ubicacion = form.cleaned_data.get('ubicacion_trabajo')
-            Perfil = __import__('vet.models', fromlist=['Perfil']).Perfil
-            Perfil.objects.create(
-                usuario=user,
-                cedula=cedula,
-                tipo_cuenta=tipo,
-                certificado=certificado,
-                ubicacion_trabajo=ubicacion,
-            )
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            cedula = form.cleaned_data['cedula']
+            password = form.cleaned_data['password']
+
+            # Crear el usuario adecuado según el tipo de cuenta
+            if tipo == 'veterinario':
+                user = UserVet.objects.create_user(
+                    username=username,
+                    email=email,
+                    cedula=cedula,
+                    certificado=form.cleaned_data.get('certificado'),
+                    especializacion=form.cleaned_data.get('especializacion')  # si existe en el form
+                )
+            else:
+                user = UserPet.objects.create_user(
+                    username=username,
+                    email=email,
+                    cedula=cedula,
+                )
+
+            user.set_password(password)
+            user.save()
+
+            # Loguear automáticamente después de registrarse
+            login(request, user)
+            messages.success(request, f'¡Bienvenido, {user.username}!')
             return redirect('home')
     else:
         form = SignUpForm()
+
     return render(request, 'signup.html', {'form': form})
-import json
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Message
-from .forms import VeterinaryServiceRequestForm
-from django.http import JsonResponse
-from django.shortcuts import render
-from .models import Veterinario
-from math import radians, sin, cos, sqrt, atan2
-from django.db.models import Q
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import re
+
 
 # Create your views here.
 @ensure_csrf_cookie
@@ -88,7 +79,18 @@ def home(request):
     return render(request, 'home.html')
 
 def about(request):
-    return render(request, 'about.html')
+    is_vet = False
+    is_pet = False
+
+    if request.user.is_authenticated:
+        # Check if the logged user has a vet or pet profile
+        is_vet = hasattr(request.user, 'uservet')
+        is_pet = hasattr(request.user, 'userpet')
+
+    return render(request, 'about.html', {
+        'is_vet': is_vet,
+        'is_pet': is_pet,
+    })
 
 
 def chat_view(request):
@@ -172,7 +174,7 @@ def veterinarios_por_especializacion(request):
     Busca veterinarios por especializacion (query param: q) y muestra resultados paginados.
     """
     q = request.GET.get('q', '').strip()
-    veterinarios = Veterinario.objects.all()
+    veterinarios = UserVet.objects.all()
     if q:
         # Tokenize query and match any token in name or specialization (OR across tokens)
         tokens = [t for t in re.split(r"\s+", q) if t]
@@ -209,7 +211,7 @@ def veterinarios_por_especializacion(request):
 @ensure_csrf_cookie
 def veterinarios_list(request):
     """Listado completo de veterinarios paginado."""
-    veterinarios = Veterinario.objects.all().order_by('nombre')
+    veterinarios = UserVet.objects.all().order_by('username')
     page = request.GET.get('page', 1)
     paginator = Paginator(veterinarios, 9)
     try:
@@ -225,21 +227,30 @@ def veterinarios_list(request):
     })
 
 @login_required
+@require_POST
 def toggle_favorite(request, vet_id):
-    perfil = Perfil.objects.get(usuario=request.user)
-    veterinario = Veterinario.objects.get(id=vet_id)
+    if not isinstance(request.user, UserPet):
+        return JsonResponse({'error': 'Solo los usuarios tipo Pet pueden marcar favoritos.'}, status=403)
+    
+    user = request.user
+    veterinario = get_object_or_404(UserVet, id=vet_id)
 
-    if veterinario in perfil.favoritos.all():
-        perfil.favoritos.remove(veterinario)
+    if veterinario in user.favoritos.all():
+        user.favoritos.remove(veterinario)
         is_favorite = False
     else:
-        perfil.favoritos.add(veterinario)
+        user.favoritos.add(veterinario)
         is_favorite = True
 
     return JsonResponse({'is_favorite': is_favorite})
 
+
 @login_required
 def mis_favoritos(request):
-    perfil = Perfil.objects.get(usuario=request.user)
-    veterinarios = perfil.favoritos.all()  # all favorite vets of this user
+    user = request.user
+
+    if not isinstance(user, UserPet):
+        return redirect('home')
+
+    veterinarios = user.favoritos.all()
     return render(request, 'mis_favoritos.html', {'veterinarios': veterinarios})

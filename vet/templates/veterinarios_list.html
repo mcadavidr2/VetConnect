@@ -67,14 +67,13 @@
           <div class="card h-100 shadow-sm position-relative vet-card">
             <div class="card-body">
               {% if request.user.is_authenticated %}
-                {% if vet in request.user.perfil.favoritos.all %}
+                {% if vet in request.user.favoritos.all %}
                   <span class="favorite-heart" onclick="toggleFavorite({{ vet.id }}, this)">❤️</span>
                 {% else %}
                   <span class="favorite-heart" onclick="toggleFavorite({{ vet.id }}, this)">🤍</span>
                 {% endif %}
               {% endif %}
-
-              <h2 class="h5 mb-2">{{ vet.nombre }}</h2>
+              <h2 class="h5 mb-2">{{ vet.username }}</h2>
               <p class="mb-1">{{ vet.direccion }}</p>
               <p class="mb-1">Especialización: {{ vet.especializacion }}</p>
               <p class="mb-1">📞 {{ vet.telefono }}</p>
@@ -115,23 +114,42 @@
 </div>
 
 <script>
-function toggleFavorite(vetId, el) {
-  fetch(`/toggle-favorite/${vetId}/`, {
-    method: 'GET',
-    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.is_favorite) {
-      el.textContent = '❤️';
-      el.style.color = 'red';
-    } else {
-      el.textContent = '🤍';
-      el.style.color = '';
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-  })
-  .catch(console.error);
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function toggleFavorite(vetId, element) {
+    fetch(`/toggle-favorite/${vetId}/`, {
+        method: 'POST',  // 👈 CAMBIADO: antes era GET
+        headers: {
+            'X-CSRFToken': csrftoken,  // necesario para Django
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        element.textContent = data.is_favorite ? '❤️' : '🤍';
+    })
+    .catch(err => console.error('Error:', err));
 }
 </script>
+
 
 {% endblock %}

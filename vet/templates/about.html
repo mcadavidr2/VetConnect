@@ -86,8 +86,19 @@
 <!-- ===== HERO ===== -->
 <section class="about-hero">
   <div class="container">
+    {% if is_vet %}
+      <h2>¡Hola, veterinario!</h2>
+    {% elif is_pet %}
+      <h2>¡Hola, usuario de mascota!</h2>
+    {% else %}
+      <h2>¡Hola, usuario!</h2>
+    {% endif %}
+
     <h1 class="display-6 mb-1">Acerca de VetConnect</h1>
-    <p>Conectamos tutores de mascotas con veterinarios verificados: disponibilidad en tiempo real, precios transparentes y atención en casa o en clínica.</p>
+    <p>
+      Conectamos tutores de mascotas con veterinarios verificados: disponibilidad en tiempo real,
+      precios transparentes y atención en casa o en clínica.
+    </p>
   </div>
 </section>
 

@@ -1,0 +1,41 @@
+cedula,passwod,nombre,direccion,telefono,email,latitud,longitud,especializacion
+123,password,Clínica Vet Mayorca,"Cra. 45 #50 Sur-150, Sabaneta",6041111111,mayorca@vet.com,6.15,-75.617,
+123,password,Centro Animal Las Lomitas,"Calle 75 Sur #45-30, Sabaneta",6042222222,lomitas@vet.com,6.148,-75.614,
+123,password,Veterinaria La Doctora,"Cra. 44 #72 Sur-40, Sabaneta",6043333333,ladoctora@vet.com,6.146,-75.615,
+123,password,Clínica Animal Parque Sabaneta,"Calle 70 Sur #43-12, Centro, Sabaneta",6044444444,parquesabaneta@vet.com,6.15,-75.614,
+123,password,Vet Amigos San Joaquín,"Cra. 43 #73 Sur-25, Sabaneta",6045555555,sanjoaquin@vet.com,6.145,-75.613,
+123,password,Pet Salud Aves María,"Calle 77 Sur #46-20, Aves María, Sabaneta",6046666666,avesmaria@vet.com,6.143,-75.611,
+123,password,Clínica Veterinaria Vegas Plaza,"Cra. 48 #75 Sur-100, Sabaneta",6047777777,vegasplaza@vet.com,6.142,-75.618,
+123,password,Vet Express La Barquereña,"Cra. 46 #71 Sur-18, Sabaneta",6048888888,barquerenia@vet.com,6.149,-75.612,
+123,password,Clínica Mascotas Campestre,"Calle 72 Sur #47-05, Campestre, Sabaneta",6049999999,campestresabaneta@vet.com,6.147,-75.616,
+123,password,Patitas Felices Sabaneta,"Cra. 42 #74 Sur-22, Sabaneta",6041010101,patitassabaneta@vet.com,6.144,-75.61,
+123,password,Clínica Vet San Fernando,"Cra. 48 #10-25, El Poblado",6041234567,sanfernando@vet.com,6.199,-75.578,
+123,password,Consultorio Animal EAFIT,Calle 10 Sur #50-12,6042345678,animaleafit@vet.com,6.201,-75.579,
+123,password,Pet Salud Premium,Cra. 49 #9 Sur-40,6043456789,petsalud@vet.com,6.202,-75.58,
+123,password,Amigos Peludos Vet,Calle 12 Sur #48-20,6044567890,amigospeludos@vet.com,6.198,-75.577,
+123,password,Clínica Mascotas La Frontera,Cra. 43A #16 Sur-30,6045678901,frontera@vet.com,6.196,-75.582,
+123,password,Centro Vet Campestre,Av. Las Vegas #12 Sur-50,6046789012,campestre@vet.com,6.2,-75.583,
+123,password,Vida Animal Poblado,Calle 7 Sur #43-99,6047890123,vidaanimal@vet.com,6.203,-75.576,
+123,password,Clínica Felina y Canina EAFIT,Cra. 48B #10 Sur-60,6048901234,felinacanina@vet.com,6.197,-75.579,
+123,password,Vet Express Oviedo,Cra. 43A #6 Sur-150,6049012345,vetexpress@vet.com,6.205,-75.574,
+123,password,Clínica Patitas Felices,Calle 8 Sur #50-10,6040123456,patitas@vet.com,6.204,-75.581,
+123,password,Clínica Veterinaria San Joaquín,"Calle 43 #67-21, San Joaquín, Medellín",6044441020,sanjoaquinvet@vet.com,0,0,Cirugía y Traumatología
+123,password,Centro Animal Laureles,"Carrera 80 #33-45, Laureles, Medellín",6044441188,laurelescentro@vet.com,0,0,Dermatología Veterinaria
+123,password,Clínica Mascotas El Poblado,"Carrera 36 #10-51, El Poblado, Medellín",6044442387,elpobladovet@vet.com,0,0,Medicina Felina
+123,password,AnimalCare Belén Rosales,"Calle 30A #69-12, Belén Rosales, Medellín",6044444512,belencare@vet.com,0,0,Odontología Veterinaria
+123,password,Veterinaria San Lucas Pets,"Transversal Superior #20-35, El Poblado, Medellín",6044442219,sanlucaspets@vet.com,0,0,Reproducción Animal
+123,password,Clínica Animal Castilla,"Carrera 65 #95-15, Castilla, Medellín",6044445560,castillavet@vet.com,0,0,Medicina Preventiva
+123,password,PetSalud Envigado,"Carrera 43A #30 Sur 50, Envigado",6044447901,petsaludenvigado@vet.com,0,0,Cardiología Veterinaria
+123,password,Vet Norte Caribe,"Carrera 71 #97-20, Caribe, Medellín",6044449904,vetnortecaribe@vet.com,0,0,Diagnóstico por Imagen
+123,password,Hospital Animal La América,"Calle 44 #79-22, La América, Medellín",6044447809,laamericavet@vet.com,0,0,Urgencias 24h
+123,password,Clínica Veterinaria La Mota,"Carrera 82 #15A-30, La Mota, Medellín",6044443233,lamotavet@vet.com,0,0,Cirugía Laparoscópica
+123,password,Centro Animal Robledo,"Carrera 88 #65-17, Robledo, Medellín",6044448405,robledovet@vet.com,0,0,Rehabilitación y Fisioterapia
+123,password,PetZone Estadio,"Calle 48 #70-80, Estadio, Medellín",6044446542,estadiopetzone@vet.com,0,0,Medicina Interna
+123,password,Clínica Canis y Felis Prado,"Carrera 51D #61-24, Prado Centro, Medellín",6044447100,pradocanisfelis@vet.com,0,0,Oftalmología Veterinaria
+123,password,Animal Health Manrique,"Carrera 45 #71-30, Manrique Central, Medellín",6044449531,manriquehealth@vet.com,0,0,Nutrición Animal
+123,password,Clínica VetBoston Medellín,"Carrera 43F #74-10, Barrio Boston, Medellín",6044448820,vetboston@vet.com,0,0,Oncología Veterinaria
+123,password,PetLife Floresta,"Carrera 79 #49-26, La Floresta, Medellín",6044443170,florestapetlife@vet.com,0,0,Endocrinología Veterinaria
+123,password,Centro Veterinario Aranjuez,"Carrera 50 #91-40, Aranjuez, Medellín",6044446655,aranjuezvet@vet.com,0,0,Patología Clínica
+123,password,VetSur Guayabal,"Calle 8 #52-17, Guayabal, Medellín",6044449021,vetsurguayabal@vet.com,0,0,Cirugía Ortopédica
+123,password,Clínica Animal Buenos Aires,"Carrera 39 #47-60, Buenos Aires, Medellín",6044441342,buenosairesvet@vet.com,0,0,Medicina Exótica
+123,password,Hospital Mascotas San Antonio,"Calle 32 #80-25, San Antonio de Prado, Medellín",6044448745,sanantoniovet@vet.com,0,0,Anestesiología y Cuidados Intensivos
