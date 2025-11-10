@@ -208,7 +208,7 @@ def veterinarios_por_especializacion(request):
     })
 
 
-@ensure_csrf_cookie
+@login_required
 def veterinarios_list(request):
     """Listado completo de veterinarios paginado."""
     veterinarios = UserVet.objects.all().order_by('username')
@@ -221,25 +221,33 @@ def veterinarios_list(request):
     except EmptyPage:
         veterinarios_page = paginator.page(paginator.num_pages)
 
+    # get UserPet instance if possible
+    user_pet = None
+    if hasattr(request.user, 'userpet'):
+        user_pet = request.user.userpet
+
     return render(request, 'veterinarios_list.html', {
         'veterinarios': veterinarios_page,
-        'paginator': paginator,
+        'user_pet': user_pet,
     })
 
 @login_required
-@require_POST
 def toggle_favorite(request, vet_id):
-    if not isinstance(request.user, UserPet):
-        return JsonResponse({'error': 'Solo los usuarios tipo Pet pueden marcar favoritos.'}, status=403)
-    
     user = request.user
-    veterinario = get_object_or_404(UserVet, id=vet_id)
 
-    if veterinario in user.favoritos.all():
-        user.favoritos.remove(veterinario)
+    # try to get UserPet version
+    try:
+        user_pet = user.userpet
+    except UserPet.DoesNotExist:
+        return JsonResponse({'error': 'Only pets can favorite vets.'}, status=403)
+
+    vet = get_object_or_404(UserVet, id=vet_id)
+
+    if vet in user_pet.favoritos.all():
+        user_pet.favoritos.remove(vet)
         is_favorite = False
     else:
-        user.favoritos.add(veterinario)
+        user_pet.favoritos.add(vet)
         is_favorite = True
 
     return JsonResponse({'is_favorite': is_favorite})
@@ -249,8 +257,11 @@ def toggle_favorite(request, vet_id):
 def mis_favoritos(request):
     user = request.user
 
-    if not isinstance(user, UserPet):
-        return redirect('home')
+    # try to get UserPet version
+    try:
+        user_pet = user.userpet
+    except UserPet.DoesNotExist:
+        return JsonResponse({'error': 'Only pets can favorite vets.'}, status=403)
 
-    veterinarios = user.favoritos.all()
+    veterinarios = user_pet.favoritos.all()
     return render(request, 'mis_favoritos.html', {'veterinarios': veterinarios})

@@ -66,8 +66,8 @@
           <!-- añade 'vet-card' sin cambiar la lógica -->
           <div class="card h-100 shadow-sm position-relative vet-card">
             <div class="card-body">
-              {% if request.user.is_authenticated %}
-                {% if vet in request.user.favoritos.all %}
+              {% if user_pet %}
+                {% if vet in user_pet.favoritos.all %}
                   <span class="favorite-heart" onclick="toggleFavorite({{ vet.id }}, this)">❤️</span>
                 {% else %}
                   <span class="favorite-heart" onclick="toggleFavorite({{ vet.id }}, this)">🤍</span>
@@ -114,42 +114,33 @@
 </div>
 
 <script>
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-const csrftoken = getCookie('csrftoken');
-
 function toggleFavorite(vetId, element) {
-    fetch(`/toggle-favorite/${vetId}/`, {
-        method: 'POST',  // 👈 CAMBIADO: antes era GET
-        headers: {
-            'X-CSRFToken': csrftoken,  // necesario para Django
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        element.textContent = data.is_favorite ? '❤️' : '🤍';
-    })
-    .catch(err => console.error('Error:', err));
+  fetch(`/toggle-favorite/${vetId}/`, {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      if (response.status === 403) {
+        alert('Only pet users can add favorites.');
+      } else {
+        alert('An error occurred.');
+      }
+      throw new Error('Request failed.');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.is_favorite) {
+      element.textContent = '❤️';
+    } else {
+      element.textContent = '🤍';
+    }
+  })
+  .catch(error => console.error(error));
 }
 </script>
-
 
 {% endblock %}
