@@ -55,7 +55,8 @@ def signup(request):
                     email=email,
                     cedula=cedula,
                     certificado=form.cleaned_data.get('certificado'),
-                    especializacion=form.cleaned_data.get('especializacion')  # si existe en el form
+                    especializacion=form.cleaned_data.get('especializacion'),
+                    años_experiencia=form.cleaned_data.get('años_experiencia')
                 )
             else:
                 user = UserPet.objects.create_user(
@@ -172,25 +173,41 @@ def veterinarios_cercanos(request):
 @ensure_csrf_cookie
 def veterinarios_por_especializacion(request):
     """
-    Busca veterinarios por especializacion (query param: q) y muestra resultados paginados.
+    Busca veterinarios por especializacion (query param: q) y años de experiencia
+    (query param: años_exp) y muestra resultados paginados.
     """
     q = request.GET.get('q', '').strip()
+    años_exp = request.GET.get('años_exp', '').strip()
+    
     veterinarios = UserVet.objects.all()
+    
+    # Filtrar por nombre o especialización
     if q:
         # Tokenize query and match any token in name or specialization (OR across tokens)
         tokens = [t for t in re.split(r"\s+", q) if t]
         combined_q = None
         for token in tokens:
-            token_q = Q(especializacion__icontains=token) | Q(nombre__icontains=token)
+            token_q = Q(especializacion__icontains=token) | Q(username__icontains=token)
             if combined_q is None:
                 combined_q = token_q
             else:
                 combined_q |= token_q
         if combined_q is not None:
             veterinarios = veterinarios.filter(combined_q)
+    
+    # Filtrar por años de experiencia
+    if años_exp:
+        if años_exp == '0-2':
+            veterinarios = veterinarios.filter(años_experiencia__gte=0, años_experiencia__lte=2)
+        elif años_exp == '3-5':
+            veterinarios = veterinarios.filter(años_experiencia__gte=3, años_experiencia__lte=5)
+        elif años_exp == '6-10':
+            veterinarios = veterinarios.filter(años_experiencia__gte=6, años_experiencia__lte=10)
+        elif años_exp == '10+':
+            veterinarios = veterinarios.filter(años_experiencia__gte=10)
 
     # Ordenar por nombre para estabilidad
-    veterinarios = veterinarios.order_by('nombre')
+    veterinarios = veterinarios.order_by('username')
 
     # Paginación
     page = request.GET.get('page', 1)

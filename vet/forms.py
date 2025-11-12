@@ -20,6 +20,7 @@ class SignUpForm(forms.Form):
     certificado = forms.FileField(required=False)
     especializacion = forms.CharField(required=False)
     ubicacion_trabajo = forms.CharField(required=False)
+    años_experiencia = forms.IntegerField(required=False, min_value=0, label="Años de experiencia")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -65,4 +66,4 @@ class VetProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserVet
-        fields = ['cedula', 'direccion', 'telefono', 'certificado', 'especializacion', 'recibir_emergencias']
+        fields = ['cedula', 'direccion', 'telefono', 'certificado', 'especializacion', 'recibir_emergencias', 'años_experiencia']
