@@ -10,6 +10,7 @@ urlpatterns = [
     path('request-success/', views.service_success, name='service_success'),
     path('veterinarios/cercanos/', views.veterinarios_cercanos, name='veterinarios_cercanos'),
     path('veterinarios/buscar/', views.veterinarios_por_especializacion, name='veterinarios_por_especializacion'),
+    path('veterinarios/<int:pk>/valorar/', views.valorar_veterinario, name='valorar_veterinario'),
     path('veterinarios/', views.veterinarios_list, name='veterinarios_list'),
     path('signup/', views.signup, name='signup'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),

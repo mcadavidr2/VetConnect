@@ -2,16 +2,58 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
-from .forms import SignUpForm, VeterinaryServiceRequestForm, VetProfileForm
-from .models import User, UserPet, UserVet, Message, VeterinaryServiceRequest
+from .forms import (
+    SignUpForm,
+    ValoracionVeterinarioForm,
+    VeterinaryServiceRequestForm,
+    VetProfileForm,
+)
+from .models import (
+    Message,
+    User,
+    UserPet,
+    UserVet,
+    ValoracionVeterinario,
+    VeterinaryServiceRequest,
+)
 from math import radians, sin, cos, sqrt, atan2
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json, re
 from django.shortcuts import get_object_or_404
-from django.views.decorators.http import require_POST
+
+
+def _build_vet_profile_context(request, vet, allow_rating=True, form_override=None, extra_context=None):
+    """Common context data for the veterinarian profile template, including ratings info."""
+    valoraciones_recientes = list(
+        vet.valoraciones.select_related('usuario').order_by('-fecha_creacion')[:5]
+    )
+    puede_calificar = allow_rating and request.user.is_authenticated and request.user != vet
+    usuario_ya_valoro = False
+    valoracion_form = None
+    if puede_calificar:
+        valoracion_existente = ValoracionVeterinario.objects.filter(
+            veterinario=vet, usuario=request.user
+        ).first()
+        usuario_ya_valoro = valoracion_existente is not None
+        valoracion_form = ValoracionVeterinarioForm(instance=valoracion_existente)
+
+    if form_override is not None:
+        valoracion_form = form_override
+
+    context = {
+        'vet': vet,
+        'valoraciones_recientes': valoraciones_recientes,
+        'valoracion_form': valoracion_form,
+        'usuario_ya_valoro': usuario_ya_valoro,
+        'puede_calificar': puede_calificar,
+    }
+    if extra_context:
+        context.update(extra_context)
+    return context
 
 @login_required
 def edit_profile(request):
@@ -56,7 +98,7 @@ def signup(request):
                     cedula=cedula,
                     certificado=form.cleaned_data.get('certificado'),
                     especializacion=form.cleaned_data.get('especializacion'),
-                    años_experiencia=form.cleaned_data.get('años_experiencia')
+                    anios_experiencia=form.cleaned_data.get('anios_experiencia')
                 )
             else:
                 user = UserPet.objects.create_user(
@@ -142,8 +184,17 @@ def veterinarios_cercanos(request):
     """
     if request.method == "POST":
         data = json.loads(request.body)
-        lat_usuario = data.get('latitud')
-        lon_usuario = data.get('longitud')
+        def _safe_float(value):
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return None
+
+        lat_usuario = _safe_float(data.get('latitud'))
+        lon_usuario = _safe_float(data.get('longitud'))
+
+        if lat_usuario is None or lon_usuario is None:
+            return JsonResponse({'error': 'Coordenadas inválidas'}, status=400)
 
         # Buscar veterinarios en la base de datos
         veterinarios = UserVet.objects.all()
@@ -153,12 +204,14 @@ def veterinarios_cercanos(request):
 
         # Iterar sobre todos los veterinarios y calcular la distancia
         for vet in veterinarios:
+            if vet.latitud is None or vet.longitud is None:
+                continue  # skip vets without registered location
             distancia = calcular_distancia(lat_usuario, lon_usuario, vet.latitud, vet.longitud)
             
             # Filtrar veterinarios dentro de un rango de distancia (por ejemplo, 10 km)
             if distancia <= 10:  # 10 km de distancia
                 veterinarios_cercanos.append({
-                    'nombre': vet.nombre,
+                    'nombre': vet.nombre_profesional or f"{vet.first_name} {vet.last_name}".strip() or vet.username,
                     'direccion': vet.direccion,
                     'telefono': vet.telefono,
                     'email': vet.email,
@@ -178,6 +231,7 @@ def veterinarios_por_especializacion(request):
     """
     q = request.GET.get('q', '').strip()
     años_exp = request.GET.get('años_exp', '').strip()
+    min_rating = request.GET.get('min_rating', '').strip()
     
     veterinarios = UserVet.objects.all()
     
@@ -198,13 +252,20 @@ def veterinarios_por_especializacion(request):
     # Filtrar por años de experiencia
     if años_exp:
         if años_exp == '0-2':
-            veterinarios = veterinarios.filter(años_experiencia__gte=0, años_experiencia__lte=2)
+            veterinarios = veterinarios.filter(anios_experiencia__gte=0, anios_experiencia__lte=2)
         elif años_exp == '3-5':
-            veterinarios = veterinarios.filter(años_experiencia__gte=3, años_experiencia__lte=5)
+            veterinarios = veterinarios.filter(anios_experiencia__gte=3, anios_experiencia__lte=5)
         elif años_exp == '6-10':
-            veterinarios = veterinarios.filter(años_experiencia__gte=6, años_experiencia__lte=10)
+            veterinarios = veterinarios.filter(anios_experiencia__gte=6, anios_experiencia__lte=10)
         elif años_exp == '10+':
-            veterinarios = veterinarios.filter(años_experiencia__gte=10)
+            veterinarios = veterinarios.filter(anios_experiencia__gte=10)
+
+    if min_rating:
+        try:
+            min_rating_value = float(min_rating)
+            veterinarios = veterinarios.filter(promedio_puntuacion__gte=min_rating_value)
+        except ValueError:
+            pass
 
     # Ordenar por nombre para estabilidad
     veterinarios = veterinarios.order_by('username')
@@ -222,6 +283,8 @@ def veterinarios_por_especializacion(request):
     return render(request, 'veterinarios_por_especializacion.html', {
         'veterinarios': veterinarios_page,
         'q': q,
+        'años_exp': años_exp,
+        'min_rating': min_rating,
         'paginator': paginator,
     })
 
@@ -293,8 +356,44 @@ def vet_profile(request):
 
     vet = request.user.uservet
 
-    return render(request, 'vet_profile.html', {'vet': vet})
+    context = _build_vet_profile_context(request, vet, allow_rating=False)
+    return render(request, 'vet_profile.html', context)
 
 def vet_detail(request, vet_id):
     vet = get_object_or_404(UserVet, id=vet_id)
-    return render(request, 'vet_profile.html', {'vet': vet})
+    context = _build_vet_profile_context(request, vet)
+    return render(request, 'vet_profile.html', context)
+
+
+@login_required
+def valorar_veterinario(request, pk):
+    """Allows an authenticated user to create or update a veterinarian rating."""
+    vet = get_object_or_404(UserVet, pk=pk)
+
+    if request.user == vet:
+        messages.info(request, "No puedes calificar tu propio perfil profesional.")
+        return redirect('vet_detail', vet_id=vet.pk)
+
+    valoracion_existente = ValoracionVeterinario.objects.filter(
+        veterinario=vet, usuario=request.user
+    ).first()
+
+    if request.method == 'POST':
+        form = ValoracionVeterinarioForm(request.POST, instance=valoracion_existente)
+        if form.is_valid():
+            valoracion = form.save(commit=False)
+            valoracion.veterinario = vet
+            valoracion.usuario = request.user
+            valoracion.save()
+            messages.success(request, "Tu calificación ha sido registrada correctamente.")
+            return redirect('vet_detail', vet_id=vet.pk)
+    else:
+        form = ValoracionVeterinarioForm(instance=valoracion_existente)
+
+    context = _build_vet_profile_context(
+        request,
+        vet,
+        form_override=form,
+        extra_context={'desde_vista_valoracion': True}
+    )
+    return render(request, 'vet_profile.html', context)

@@ -1,5 +1,5 @@
 <form class="d-flex flex-column flex-md-row gap-2" role="search" action="{% url 'veterinarios_por_especializacion' %}" method="get">
-  <input class="form-control" type="search" name="q" placeholder="Buscar por especialización o nombre" value="{{ request.GET.q }}">
+  <input class="form-control" type="search" name="q" placeholder="Buscar por especialización o nombre" value="{{ request.GET.q|default:'' }}">
   
   <select class="form-select" name="años_exp" style="width: auto;">
     <option value="">Años de experiencia</option>
@@ -7,6 +7,13 @@
     <option value="3-5" {% if request.GET.años_exp == '3-5' %}selected{% endif %}>3-5 años</option>
     <option value="6-10" {% if request.GET.años_exp == '6-10' %}selected{% endif %}>6-10 años</option>
     <option value="10+" {% if request.GET.años_exp == '10+' %}selected{% endif %}>Más de 10 años</option>
+  </select>
+
+  <select class="form-select" name="min_rating" style="width: auto;">
+    <option value="">Calificación mínima</option>
+    <option value="4" {% if request.GET.min_rating == '4' %}selected{% endif %}>4 estrellas o más</option>
+    <option value="3" {% if request.GET.min_rating == '3' %}selected{% endif %}>3 estrellas o más</option>
+    <option value="2" {% if request.GET.min_rating == '2' %}selected{% endif %}>2 estrellas o más</option>
   </select>
   
   <button class="btn btn-outline-success" type="submit">Buscar</button>

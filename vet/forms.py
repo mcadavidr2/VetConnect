@@ -1,9 +1,12 @@
 from django import forms
-from .models import User, UserPet, UserVet, VeterinaryServiceRequest
 
-
-from django import forms
-from .models import UserVet, UserPet
+from .models import (
+    User,
+    UserPet,
+    UserVet,
+    ValoracionVeterinario,
+    VeterinaryServiceRequest,
+)
 
 TIPO_CUENTA_CHOICES = [
     ('usuario', 'Usuario'),
@@ -20,7 +23,7 @@ class SignUpForm(forms.Form):
     certificado = forms.FileField(required=False)
     especializacion = forms.CharField(required=False)
     ubicacion_trabajo = forms.CharField(required=False)
-    años_experiencia = forms.IntegerField(required=False, min_value=0, label="Años de experiencia")
+    anios_experiencia = forms.IntegerField(required=False, min_value=0, label="Años de experiencia")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -66,4 +69,49 @@ class VetProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserVet
-        fields = ['cedula', 'direccion', 'telefono', 'certificado', 'especializacion', 'recibir_emergencias', 'años_experiencia']
+        fields = [
+            'cedula',
+            'direccion',
+            'telefono',
+            'certificado',
+            'especializacion',
+            'recibir_emergencias',
+            'anios_experiencia',
+            'nombre_profesional',
+            'numero_licencia',
+            'tipo_profesional',
+            'formacion_academica',
+            'especialidades_adicionales',
+            'servicios_destacados',
+            'idiomas',
+            'modalidad_atencion',
+            'horario_atencion',
+        ]
+
+
+class ValoracionVeterinarioForm(forms.ModelForm):
+    """Form to submit or update a veterinarian rating."""
+
+    class Meta:
+        model = ValoracionVeterinario
+        fields = ['puntuacion', 'comentario']
+        labels = {
+            'puntuacion': 'Puntuación del servicio',
+            'comentario': 'Comentario (opcional)',
+        }
+        help_texts = {
+            'puntuacion': 'Selecciona una calificación de 1 a 5 estrellas.',
+        }
+        widgets = {
+            'puntuacion': forms.Select(
+                choices=[(i, f"{i} estrella{'s' if i > 1 else ''}") for i in range(1, 6)],
+                attrs={'class': 'form-select'}
+            ),
+            'comentario': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+        }
+
+    def clean_puntuacion(self):
+        puntuacion = self.cleaned_data.get('puntuacion')
+        if puntuacion is None or not (1 <= puntuacion <= 5):
+            raise forms.ValidationError("Debes seleccionar un valor entre 1 y 5.")
+        return puntuacion
